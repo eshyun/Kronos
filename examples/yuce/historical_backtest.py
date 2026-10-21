@@ -7,6 +7,12 @@ from datetime import datetime, timedelta
 import warnings
 
 warnings.filterwarnings('ignore')
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+EXAMPLES_DIR = SCRIPT_DIR.parent
+DEFAULT_DATA_DIR = EXAMPLES_DIR / "data"
+DEFAULT_HISTORICAL_BACKTEST_DIR = EXAMPLES_DIR / "historical_backtest"
 
 # Set default font
 plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
@@ -338,8 +344,8 @@ def main():
     # Configuration
     BACKTEST_CONFIG = {
         "stock_code": "300418",
-        "data_dir": r"D:\lianghuajiaoyi\Kronos\examples\data",
-        "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\historical_backtest",
+        "data_dir": str(DEFAULT_DATA_DIR),
+        "output_dir": str(DEFAULT_HISTORICAL_BACKTEST_DIR),
         "initial_capital": 100000,
         "lookback_days": 60,  # use 60 days of historical data
         "pred_days": 30,  # predict 30 days ahead

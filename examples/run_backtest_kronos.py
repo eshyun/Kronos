@@ -7,6 +7,12 @@ from datetime import datetime, timedelta
 import warnings
 
 warnings.filterwarnings('ignore')
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_DIR = SCRIPT_DIR / "data"
+DEFAULT_MODEL_DIR = SCRIPT_DIR / "yuce"
+DEFAULT_BACKTEST_DIR = SCRIPT_DIR / "backtest"
 
 # 设置中文字体
 plt.rcParams['font.sans-serif'] = ['SimHei']
@@ -422,9 +428,9 @@ def main():
     # 配置参数
     BACKTEST_CONFIG = {
         "stock_code": "000831",  # 要回测的股票代码
-        "data_dir": r"D:\lianghuajiaoyi\Kronos\examples\data",  # 历史数据目录
-        "model_dir": r"D:\lianghuajiaoyi\Kronos\examples\yuce",  # 模型预测结果目录
-        "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\backtest",  # 回测结果输出目录
+        "data_dir": str(DEFAULT_DATA_DIR),  # 历史数据目录
+        "model_dir": str(DEFAULT_MODEL_DIR),  # 模型预测结果目录
+        "output_dir": str(DEFAULT_BACKTEST_DIR),  # 回测结果输出目录
         "initial_capital": 100000,  # 初始资金
         "threshold": 0.02  # 交易阈值（2%）
     }

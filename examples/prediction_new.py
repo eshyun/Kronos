@@ -11,8 +11,13 @@ import time
 import random
 import akshare as ak
 from typing import Dict, List, Tuple, Optional
+from pathlib import Path
 
 warnings.filterwarnings('ignore')
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_DIR = SCRIPT_DIR / "data"
+DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "yuce"
 
 # 添加项目路径以便导入自定义模块
 sys.path.append("../src")
@@ -1357,9 +1362,9 @@ def main():
     STOCK_CONFIG = {
         "stock_code": "603288",
         "stock_name": "Haitian Flavouring",
-        "data_dir": r"D:\lianghuajiaoyi\Kronos\examples\data",
+        "data_dir": str(DEFAULT_DATA_DIR),
         "pred_days": 60,
-        "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\yuce",
+        "output_dir": str(DEFAULT_OUTPUT_DIR),
         "history_years": 1
     }
 

@@ -5,6 +5,10 @@ from datetime import datetime, timedelta
 import os
 import time
 import random
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_DIR = SCRIPT_DIR / "data"
 
 
 def get_stock_market(stock_code):
@@ -552,11 +556,12 @@ def display_data_info(df, stock_code, start_year, end_year):
                 print(f"  {display_labels.get(col, col)}: {value}")
 
 
-def save_stock_data(df, stock_code, save_dir="D:/lianghuajiaoyi/Kronos/examples/data"):
+def save_stock_data(df, stock_code, save_dir=None):
     """
     保存股票数据到指定目录
     """
     if df is not None and not df.empty:
+        save_dir = os.fspath(save_dir or DEFAULT_DATA_DIR)
         # 确保保存目录存在
         os.makedirs(save_dir, exist_ok=True)
 
@@ -577,7 +582,7 @@ def main(stock_code="002354", start_year=2024, end_year=2025):
     主函数：获取并保存股票数据 - 最终版
     """
     # 设置保存目录
-    save_directory = "D:/lianghuajiaoyi/Kronos/examples/data"
+    save_directory = os.fspath(DEFAULT_DATA_DIR)
 
     print("=" * 60)
     print(f"Fetching {start_year}-{end_year} data for stock {stock_code}")

@@ -49,6 +49,11 @@ Desktop.ini
 *.h5
 *.hdf5
 
+# Locally generated example data and outputs
+examples/data/
+examples/backtest/
+examples/historical_backtest/
+
 # Model files (large files)
 *.pth
 *.pt

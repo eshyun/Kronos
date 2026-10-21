@@ -17,6 +17,11 @@ import threading
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_DIR = SCRIPT_DIR / "data"
+DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "yuce"
 
 warnings.filterwarnings('ignore')
 
@@ -51,8 +56,8 @@ class StockPredictorGUI:
         self.default_config = {
             "stock_code": "600580",
             "stock_name": "Wolong Electric Drive",
-            "data_dir": r"D:\lianghuajiaoyi\Kronos\examples\data",
-            "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\yuce",
+            "data_dir": str(DEFAULT_DATA_DIR),
+            "output_dir": str(DEFAULT_OUTPUT_DIR),
             "pred_days": 60,
             "history_years": 1
         }
@@ -124,7 +129,7 @@ class StockPredictorGUI:
         # 数据目录
         tk.Label(dir_frame, text="Data Directory:", bg='#f0f0f0', font=("Arial", 10)).grid(row=0, column=0, sticky=tk.W,
                                                                                      padx=5, pady=5)
-        self.data_dir_var = tk.StringVar(value=r"D:\lianghuajiaoyi\Kronos\examples\data")
+        self.data_dir_var = tk.StringVar(value=str(DEFAULT_DATA_DIR))
         data_dir_entry = tk.Entry(dir_frame, textvariable=self.data_dir_var, font=("Arial", 10), width=40)
         data_dir_entry.grid(row=0, column=1, padx=5, pady=5)
         tk.Button(dir_frame, text="Browse", command=self.browse_data_dir, font=("Arial", 9)).grid(row=0, column=2, padx=5,
@@ -133,7 +138,7 @@ class StockPredictorGUI:
         # 输出目录
         tk.Label(dir_frame, text="Output Directory:", bg='#f0f0f0', font=("Arial", 10)).grid(row=1, column=0, sticky=tk.W,
                                                                                      padx=5, pady=5)
-        self.output_dir_var = tk.StringVar(value=r"D:\lianghuajiaoyi\Kronos\examples\yuce")
+        self.output_dir_var = tk.StringVar(value=str(DEFAULT_OUTPUT_DIR))
         output_dir_entry = tk.Entry(dir_frame, textvariable=self.output_dir_var, font=("Arial", 10), width=40)
         output_dir_entry.grid(row=1, column=1, padx=5, pady=5)
         tk.Button(dir_frame, text="Browse", command=self.browse_output_dir, font=("Arial", 9)).grid(row=1, column=2,
@@ -225,8 +230,8 @@ class StockPredictorGUI:
         self.stock_name_var.set("Wolong Electric Drive")
         self.pred_days_var.set("60")
         self.history_years_var.set("1")
-        self.data_dir_var.set(r"D:\lianghuajiaoyi\Kronos\examples\data")
-        self.output_dir_var.set(r"D:\lianghuajiaoyi\Kronos\examples\yuce")
+        self.data_dir_var.set(str(DEFAULT_DATA_DIR))
+        self.output_dir_var.set(str(DEFAULT_OUTPUT_DIR))
         self.result_text.delete(1.0, tk.END)
         self.progress_var.set("Waiting to start prediction...")
 

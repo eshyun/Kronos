@@ -5,6 +5,10 @@ from datetime import datetime, timedelta
 import os
 import time
 import random
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_DIR = SCRIPT_DIR / "data"
 
 
 def get_stock_market(stock_code):
@@ -576,11 +580,12 @@ def display_all_history_data_info(df, stock_code):
                 print(f"  {name}: {value}")
 
 
-def save_all_history_stock_data(df, stock_code, save_dir="D:/lianghuajiaoyi/Kronos/examples/data"):
+def save_all_history_stock_data(df, stock_code, save_dir=None):
     """
     保存全历史股票数据到指定目录
     """
     if df is not None and not df.empty:
+        save_dir = os.fspath(save_dir or DEFAULT_DATA_DIR)
         # 确保保存目录存在
         os.makedirs(save_dir, exist_ok=True)
 
@@ -610,7 +615,7 @@ def main_all_history(stock_code="002354"):
     主函数：获取并保存股票全历史数据
     """
     # 设置保存目录
-    save_directory = "D:/lianghuajiaoyi/Kronos/examples/data"
+    save_directory = os.fspath(DEFAULT_DATA_DIR)
 
     print("=" * 60)
     print(f"Starting to fetch full history for stock {stock_code}")

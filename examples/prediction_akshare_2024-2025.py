@@ -7,6 +7,11 @@ from datetime import datetime, timedelta
 import warnings
 
 warnings.filterwarnings('ignore')
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_DATA_DIR = SCRIPT_DIR / "data"
+DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "yuce"
 
 # Add project path so custom modules can be imported
 sys.path.append("../src")
@@ -520,15 +525,15 @@ if __name__ == "__main__":
     STOCK_CONFIG = {
         "stock_code": "300418",  # stock code
         "stock_name": "Kunlun Tech",  # stock name
-        "data_dir": "./data",  # data directory
+        "data_dir": str(DEFAULT_DATA_DIR),  # data directory
         "pred_days": 100,  # forecast 100 calendar days
-        "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\yuce"  # output directory
+        "output_dir": str(DEFAULT_OUTPUT_DIR)  # output directory
     }
 
     # 其他股票配置示例：
-    # STOCK_CONFIG = {"stock_code": "000001", "stock_name": "平安银行", "data_dir": "./data", "pred_days": 100, "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\yuce"}
-    # STOCK_CONFIG = {"stock_code": "600036", "stock_name": "招商银行", "data_dir": "./data", "pred_days": 100, "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\yuce"}
-    # STOCK_CONFIG = {"stock_code": "300750", "stock_name": "宁德时代", "data_dir": "./data", "pred_days": 100, "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\yuce"}
+    # STOCK_CONFIG = {"stock_code": "000001", "stock_name": "Ping An Bank", "data_dir": str(DEFAULT_DATA_DIR), "pred_days": 100, "output_dir": str(DEFAULT_OUTPUT_DIR)}
+    # STOCK_CONFIG = {"stock_code": "600036", "stock_name": "China Merchants Bank", "data_dir": str(DEFAULT_DATA_DIR), "pred_days": 100, "output_dir": str(DEFAULT_OUTPUT_DIR)}
+    # STOCK_CONFIG = {"stock_code": "300750", "stock_name": "CATL", "data_dir": str(DEFAULT_DATA_DIR), "pred_days": 100, "output_dir": str(DEFAULT_OUTPUT_DIR)}
     # =========================================================
 
     print("🤖 Smart Stock Forecast Tool")
