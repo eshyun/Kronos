@@ -7,8 +7,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch.distributed as dist
 
-sys.path.append('../')
-from model import Kronos, KronosTokenizer, KronosPredictor
+sys.path.append('../src')
+from kronos import Kronos, KronosTokenizer, KronosPredictor
 
 from config_loader import CustomFinetuneConfig
 from finetune_tokenizer import train_tokenizer, set_seed, setup_logging as setup_tokenizer_logging

@@ -8,14 +8,14 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-# 设置中文字体
-plt.rcParams['font.sans-serif'] = ['SimHei']
+# Set default font
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 class HistoricalBacktester:
     """
-    历史回测类：用历史数据验证模型预测效果
+    Historical backtest: validate model predictions against historical data
     """
 
     def __init__(self, data_dir, initial_capital=100000):
@@ -23,10 +23,10 @@ class HistoricalBacktester:
         self.initial_capital = initial_capital
 
     def load_historical_data(self, stock_code):
-        """加载历史数据"""
+        """Load historical data"""
         csv_file = os.path.join(self.data_dir, f"{stock_code}_stock_data.csv")
         if not os.path.exists(csv_file):
-            raise FileNotFoundError(f"数据文件不存在: {csv_file}")
+            raise FileNotFoundError(f"Data file not found: {csv_file}")
 
         df = pd.read_csv(csv_file, encoding='utf-8-sig')
 
@@ -49,8 +49,8 @@ class HistoricalBacktester:
         df.set_index('date', inplace=True)
         df = df.sort_index()
 
-        print(f"✅ 加载历史数据: {len(df)} 条记录")
-        print(f"时间范围: {df.index.min()} 到 {df.index.max()}")
+        print(f"✅ Loaded historical data: {len(df)} records")
+        print(f"Time range: {df.index.min()} to {df.index.max()}")
 
         return df
 
@@ -108,11 +108,11 @@ class HistoricalBacktester:
         results_df['abs_error_pct'] = abs(results_df['error_pct'])
 
         accuracy_metrics = {
-            '平均绝对误差率': results_df['abs_error_pct'].mean(),
-            '预测准确率': (results_df['abs_error_pct'] < 0.05).mean(),  # 误差小于5%算准确
-            '方向准确率': (np.sign(results_df['predicted_close'].diff()) ==
-                           np.sign(results_df['actual_close'].diff())).mean(),
-            '相关系数': results_df['predicted_close'].corr(results_df['actual_close'])
+            'Mean Absolute Error Rate': results_df['abs_error_pct'].mean(),
+            'Prediction Accuracy': (results_df['abs_error_pct'] < 0.05).mean(),  # error below 5% counts as accurate
+            'Directional Accuracy': (np.sign(results_df['predicted_close'].diff()) ==
+                                     np.sign(results_df['actual_close'].diff())).mean(),
+            'Correlation Coefficient': results_df['predicted_close'].corr(results_df['actual_close'])
         }
 
         return accuracy_metrics
@@ -144,7 +144,7 @@ class HistoricalBacktester:
                         'action': 'BUY',
                         'price': current_price,
                         'shares': shares,
-                        'reason': f'预测上涨{predicted_return:.2%}'
+                        'reason': f'Predicted rise of {predicted_return:.2%}'
                     })
 
             elif position > 0 and predicted_return < -threshold:
@@ -155,7 +155,7 @@ class HistoricalBacktester:
                     'action': 'SELL',
                     'price': current_price,
                     'shares': position,
-                    'reason': f'预测下跌{predicted_return:.2%}'
+                    'reason': f'Predicted drop of {predicted_return:.2%}'
                 })
                 position = 0
 
@@ -198,15 +198,15 @@ class HistoricalBacktester:
             0]
 
         performance = {
-            '策略总收益': total_return,
-            '策略年化收益': annual_return,
-            '买入持有收益': buy_hold_return,
-            '波动率': volatility,
-            '夏普比率': sharpe_ratio,
-            '最大回撤': max_drawdown,
-            '交易次数': len(trades),
-            '最终资金': portfolio_df['portfolio_value'].iloc[-1],
-            '超额收益': total_return - buy_hold_return
+            'Strategy Total Return': total_return,
+            'Strategy Annual Return': annual_return,
+            'Buy & Hold Return': buy_hold_return,
+            'Volatility': volatility,
+            'Sharpe Ratio': sharpe_ratio,
+            'Max Drawdown': max_drawdown,
+            'Trade Count': len(trades),
+            'Final Capital': portfolio_df['portfolio_value'].iloc[-1],
+            'Excess Return': total_return - buy_hold_return
         }
 
         return performance
@@ -215,40 +215,40 @@ class HistoricalBacktester:
         """绘制预测对比图表"""
         fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(15, 12))
 
-        # 1. 价格预测对比
+        # 1. Price prediction comparison
         ax1.plot(results_df.index, results_df['actual_close'],
-                 label='实际价格', color='blue', linewidth=2)
+                 label='Actual Price', color='blue', linewidth=2)
         ax1.plot(results_df.index, results_df['predicted_close'],
-                 label='预测价格', color='red', linestyle='--', alpha=0.7)
-        ax1.set_ylabel('价格 (元)')
+                 label='Predicted Price', color='red', linestyle='--', alpha=0.7)
+        ax1.set_ylabel('Price (CNY)')
         ax1.legend()
-        ax1.set_title(f'{stock_code} - 价格预测 vs 实际走势', fontsize=14, fontweight='bold')
+        ax1.set_title(f'{stock_code} - Predicted vs Actual Price', fontsize=14, fontweight='bold')
         ax1.grid(True, alpha=0.3)
 
-        # 2. 预测误差
+        # 2. Prediction error
         ax2.bar(results_df.index, results_df['error_pct'] * 100,
                 alpha=0.6, color='orange')
         ax2.axhline(y=0, color='black', linestyle='-', linewidth=1)
-        ax2.set_ylabel('预测误差 (%)')
-        ax2.set_title('预测误差分析')
+        ax2.set_ylabel('Prediction Error (%)')
+        ax2.set_title('Prediction Error Analysis')
         ax2.grid(True, alpha=0.3)
 
-        # 3. 策略表现
+        # 3. Strategy performance
         ax3.plot(portfolio_df['date'], portfolio_df['portfolio_value'],
-                 label='策略资金曲线', color='green', linewidth=2)
+                 label='Strategy Equity Curve', color='green', linewidth=2)
         ax3.axhline(y=self.initial_capital, color='red', linestyle='--',
-                    label=f'初始资金 ({self.initial_capital:,.0f}元)')
+                    label=f'Initial Capital ({self.initial_capital:,.0f} CNY)')
 
-        # 买入持有对比
+        # Buy & hold comparison
         initial_shares = self.initial_capital / portfolio_df['price'].iloc[0]
         buy_hold_values = portfolio_df['price'] * initial_shares
         ax3.plot(portfolio_df['date'], buy_hold_values,
-                 label='买入持有策略', color='blue', linestyle=':', alpha=0.7)
+                 label='Buy & Hold Strategy', color='blue', linestyle=':', alpha=0.7)
 
-        ax3.set_ylabel('资金 (元)')
-        ax3.set_xlabel('日期')
+        ax3.set_ylabel('Capital (CNY)')
+        ax3.set_xlabel('Date')
         ax3.legend()
-        ax3.set_title('策略表现对比')
+        ax3.set_title('Strategy Performance Comparison')
         ax3.grid(True, alpha=0.3)
 
         plt.tight_layout()
@@ -257,101 +257,101 @@ class HistoricalBacktester:
         os.makedirs(output_dir, exist_ok=True)
         chart_file = os.path.join(output_dir, f'{stock_code}_historical_backtest.png')
         plt.savefig(chart_file, dpi=300, bbox_inches='tight')
-        print(f"📊 历史回测图表已保存: {chart_file}")
+        print(f"📊 Historical backtest chart saved: {chart_file}")
 
         plt.show()
 
     def run_complete_backtest(self, stock_code, output_dir, lookback_days=60, pred_days=30, threshold=0.03):
         """运行完整的历史回测"""
-        print(f"🎯 开始 {stock_code} 历史回测分析")
+        print(f"🎯 Starting historical backtest analysis for {stock_code}")
         print("=" * 60)
 
         try:
-            # 1. 加载历史数据
-            print("步骤1: 加载历史数据...")
+            # 1. Load historical data
+            print("Step 1: Loading historical data...")
             df = self.load_historical_data(stock_code)
 
-            # 2. 模拟模型预测
-            print("步骤2: 模拟模型预测...")
+            # 2. Simulate model predictions
+            print("Step 2: Simulating model predictions...")
             results_df = self.simulate_model_prediction(df, lookback_days, pred_days)
 
-            # 3. 计算预测准确率
-            print("步骤3: 计算预测准确率...")
+            # 3. Calculate prediction accuracy
+            print("Step 3: Calculating prediction accuracy...")
             accuracy_metrics = self.calculate_prediction_accuracy(results_df)
 
-            # 4. 运行交易策略
-            print("步骤4: 运行交易策略...")
+            # 4. Run trading strategy
+            print("Step 4: Running trading strategy...")
             portfolio_df, trades = self.run_trading_strategy(results_df, threshold)
 
-            # 5. 计算策略表现
-            print("步骤5: 计算策略表现...")
+            # 5. Calculate strategy performance
+            print("Step 5: Calculating strategy performance...")
             performance = self.calculate_performance(portfolio_df, trades)
 
-            # 6. 绘制结果
-            print("步骤6: 生成回测图表...")
+            # 6. Plot results
+            print("Step 6: Generating backtest charts...")
             self.plot_comparison(results_df, portfolio_df, stock_code, output_dir)
 
-            # 7. 打印报告
+            # 7. Print report
             print("\n" + "=" * 70)
-            print(f"📊 {stock_code} 历史回测报告")
+            print(f"📊 {stock_code} Historical Backtest Report")
             print("=" * 70)
 
-            print("\n🔍 预测准确率分析:")
+            print("\n🔍 Prediction Accuracy Analysis:")
             for metric, value in accuracy_metrics.items():
                 if isinstance(value, float):
                     print(f"  {metric}: {value:.2%}")
                 else:
                     print(f"  {metric}: {value:.4f}")
 
-            print("\n💰 策略表现分析:")
+            print("\n💰 Strategy Performance Analysis:")
             for metric, value in performance.items():
                 if isinstance(value, float):
-                    if '收益' in metric or '回撤' in metric:
+                    if 'Return' in metric or 'Drawdown' in metric:
                         print(f"  {metric}: {value:.2%}")
                     else:
                         print(f"  {metric}: {value:.4f}")
                 else:
                     print(f"  {metric}: {value}")
 
-            print(f"\n📈 交易统计:")
-            print(f"  总交易次数: {len(trades)}")
-            print(f"  买入次数: {len([t for t in trades if t['action'] == 'BUY'])}")
-            print(f"  卖出次数: {len([t for t in trades if t['action'] == 'SELL'])}")
+            print(f"\n📈 Trade Statistics:")
+            print(f"  Total trades: {len(trades)}")
+            print(f"  Buy trades: {len([t for t in trades if t['action'] == 'BUY'])}")
+            print(f"  Sell trades: {len([t for t in trades if t['action'] == 'SELL'])}")
 
             if len(trades) > 0:
-                print(f"\n最近5次交易:")
+                print(f"\nLast 5 trades:")
                 for trade in trades[-5:]:
                     print(f"  {trade['date'].strftime('%Y-%m-%d')} {trade['action']} "
-                          f"{trade['shares']}股 @ {trade['price']:.2f}元 - {trade['reason']}")
+                          f"{trade['shares']} shares @ {trade['price']:.2f} CNY - {trade['reason']}")
 
             return accuracy_metrics, performance, results_df
 
         except Exception as e:
-            print(f"❌ 回测过程中出现错误: {e}")
+            print(f"❌ Error during backtest: {e}")
             import traceback
             traceback.print_exc()
             return None, None, None
 
 
 def main():
-    """主函数"""
-    # 配置参数
+    """Entry point"""
+    # Configuration
     BACKTEST_CONFIG = {
         "stock_code": "300418",
         "data_dir": r"D:\lianghuajiaoyi\Kronos\examples\data",
         "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\historical_backtest",
         "initial_capital": 100000,
-        "lookback_days": 60,  # 使用60天历史数据
-        "pred_days": 30,  # 预测30天
-        "threshold": 0.03  # 3%的交易阈值
+        "lookback_days": 60,  # use 60 days of historical data
+        "pred_days": 30,  # predict 30 days ahead
+        "threshold": 0.03  # 3% trading threshold
     }
 
-    print("🤖 Kronos模型历史回测系统")
+    print("🤖 Kronos Model Historical Backtest System")
     print("=" * 50)
-    print(f"回测股票: {BACKTEST_CONFIG['stock_code']}")
-    print(f"回看天数: {BACKTEST_CONFIG['lookback_days']}天")
-    print(f"预测天数: {BACKTEST_CONFIG['pred_days']}天")
-    print(f"初始资金: {BACKTEST_CONFIG['initial_capital']:,.0f}元")
+    print(f"Stock: {BACKTEST_CONFIG['stock_code']}")
+    print(f"Lookback days: {BACKTEST_CONFIG['lookback_days']}")
+    print(f"Prediction days: {BACKTEST_CONFIG['pred_days']}")
+    print(f"Initial capital: {BACKTEST_CONFIG['initial_capital']:,.0f} CNY")
     print()
 
     # 创建回测器并运行
@@ -369,15 +369,15 @@ def main():
     )
 
     if accuracy and performance:
-        print(f"\n✅ {BACKTEST_CONFIG['stock_code']} 历史回测完成!")
+        print(f"\n✅ {BACKTEST_CONFIG['stock_code']} historical backtest completed!")
 
-        # 简单结论
-        if performance['超额收益'] > 0:
-            print("🎉 结论: 模型策略跑赢了买入持有策略!")
+        # Simple conclusion
+        if performance['Excess Return'] > 0:
+            print("🎉 Conclusion: the model strategy beat the buy & hold strategy!")
         else:
-            print("⚠️ 结论: 模型策略未能跑赢买入持有策略。")
+            print("⚠️ Conclusion: the model strategy did not beat the buy & hold strategy.")
 
-        print(f"📁 详细结果保存在: {BACKTEST_CONFIG['output_dir']}")
+        print(f"📁 Detailed results saved to: {BACKTEST_CONFIG['output_dir']}")
 
 
 if __name__ == "__main__":

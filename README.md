@@ -86,10 +86,25 @@ We release a family of pre-trained models with varying capacities to suit differ
 
 ### Installation
 
-1. Install Python 3.10+, and then install the dependencies:
+Install Python 3.10+, then install Kronos as a package (editable for development):
 
 ```shell
-pip install -r requirements.txt
+pip install -e .
+```
+
+Optional extras:
+
+```shell
+pip install -e ".[examples]"   # example scripts and data fetchers
+pip install -e ".[webui]"      # Flask web UI
+pip install -e ".[qlib]"       # Qlib fine-tuning pipeline
+```
+
+Build a wheel or source distribution for use in another project:
+
+```shell
+uv build                       # or: python -m build
+pip install dist/kronos-0.1.0-py3-none-any.whl
 ```
 
 ### 📈 Making Forecasts
@@ -105,7 +120,7 @@ Here is a step-by-step guide to making your first forecast.
 First, load a pre-trained Kronos model and its corresponding tokenizer from the Hugging Face Hub.
 
 ```python
-from model import Kronos, KronosTokenizer, KronosPredictor
+from kronos import Kronos, KronosTokenizer, KronosPredictor
 
 # Load from Hugging Face Hub
 tokenizer = KronosTokenizer.from_pretrained("NeoQuasar/Kronos-Tokenizer-base")
@@ -229,12 +244,11 @@ The finetuning process is divided into four main steps:
 
 ### Prerequisites
 
-1.  First, ensure you have all dependencies from `requirements.txt` installed.
-2.  This pipeline relies on `qlib`. Please install it:
+1.  Install the package with the Qlib extra:
     ```shell
-      pip install pyqlib
+      pip install -e ".[qlib]"
     ```
-3.  You will need to prepare your Qlib data. Follow the [official Qlib guide](https://github.com/microsoft/qlib) to download and set up your data locally. The example scripts assume you are using daily frequency data.
+2.  You will need to prepare your Qlib data. Follow the [official Qlib guide](https://github.com/microsoft/qlib) to download and set up your data locally. The example scripts assume you are using daily frequency data.
 
 ### Step 1: Configure Your Experiment
 

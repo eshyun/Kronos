@@ -11,11 +11,12 @@ import warnings
 import datetime
 warnings.filterwarnings('ignore')
 
-# Add project root directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the src directory to path so the package works without installation
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(PROJECT_ROOT, "src"))
 
 try:
-    from model import Kronos, KronosTokenizer, KronosPredictor
+    from kronos import Kronos, KronosTokenizer, KronosPredictor
     MODEL_AVAILABLE = True
 except ImportError:
     MODEL_AVAILABLE = False

@@ -20,9 +20,9 @@ from qlib.utils import flatten_dict
 from qlib.utils.time import Freq
 
 # Ensure project root is in the Python path
-sys.path.append("../")
+sys.path.append("../src")
 from config import Config
-from model.kronos import Kronos, KronosTokenizer, auto_regressive_inference
+from kronos.kronos import Kronos, KronosTokenizer, auto_regressive_inference
 
 
 # =================================================================================

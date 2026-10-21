@@ -21,11 +21,11 @@ import matplotlib.ticker as ticker
 warnings.filterwarnings('ignore')
 
 # 添加项目路径以便导入自定义模块
-sys.path.append("../")
+sys.path.append("../src")
 try:
-    from model import Kronos, KronosTokenizer, KronosPredictor
+    from kronos import Kronos, KronosTokenizer, KronosPredictor
 except ImportError:
-    print("⚠️ 无法导入Kronos模型，预测功能将不可用")
+    print("⚠️ Failed to import the Kronos model; prediction features are unavailable")
 
 # 设置中文字体
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
@@ -37,7 +37,7 @@ class StockPredictorGUI:
 
     def __init__(self, root):
         self.root = root
-        self.root.title("Kronos股票预测系统")
+        self.root.title("Kronos Stock Prediction System")
         self.root.geometry("800x600")
         self.root.configure(bg='#f0f0f0')
 
@@ -50,7 +50,7 @@ class StockPredictorGUI:
         # 默认配置
         self.default_config = {
             "stock_code": "600580",
-            "stock_name": "卧龙电驱",
+            "stock_name": "Wolong Electric Drive",
             "data_dir": r"D:\lianghuajiaoyi\Kronos\examples\data",
             "output_dir": r"D:\lianghuajiaoyi\Kronos\examples\yuce",
             "pred_days": 60,
@@ -62,7 +62,7 @@ class StockPredictorGUI:
         # 主标题
         title_label = tk.Label(
             self.root,
-            text="🤖 Kronos股票预测系统",
+            text="🤖 Kronos Stock Prediction System",
             font=("Arial", 16, "bold"),
             bg='#f0f0f0',
             fg='#2c3e50'
@@ -72,7 +72,7 @@ class StockPredictorGUI:
         # 说明标签
         desc_label = tk.Label(
             self.root,
-            text="基于Kronos模型的多维度股票价格预测系统",
+            text="Multi-dimensional stock price prediction powered by the Kronos model",
             font=("Arial", 10),
             bg='#f0f0f0',
             fg='#7f8c8d'
@@ -84,59 +84,59 @@ class StockPredictorGUI:
         main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
 
         # 输入框架
-        input_frame = tk.LabelFrame(main_frame, text="股票参数设置", font=("Arial", 11, "bold"),
+        input_frame = tk.LabelFrame(main_frame, text="Stock Parameters", font=("Arial", 11, "bold"),
                                     bg='#f0f0f0', fg='#2c3e50')
         input_frame.pack(fill=tk.X, pady=10)
 
         # 股票代码输入
-        tk.Label(input_frame, text="股票代码:", bg='#f0f0f0', font=("Arial", 10)).grid(row=0, column=0, sticky=tk.W,
+        tk.Label(input_frame, text="Stock Code:", bg='#f0f0f0', font=("Arial", 10)).grid(row=0, column=0, sticky=tk.W,
                                                                                        padx=5, pady=5)
         self.stock_code_var = tk.StringVar(value="600580")
         stock_code_entry = tk.Entry(input_frame, textvariable=self.stock_code_var, font=("Arial", 10), width=15)
         stock_code_entry.grid(row=0, column=1, padx=5, pady=5)
 
         # 股票名称输入
-        tk.Label(input_frame, text="股票名称:", bg='#f0f0f0', font=("Arial", 10)).grid(row=0, column=2, sticky=tk.W,
-                                                                                       padx=5, pady=5)
-        self.stock_name_var = tk.StringVar(value="卧龙电驱")
+        tk.Label(input_frame, text="Stock Name:", bg='#f0f0f0', font=("Arial", 10)).grid(row=0, column=2, sticky=tk.W,
+                                                                                        padx=5, pady=5)
+        self.stock_name_var = tk.StringVar(value="Wolong Electric Drive")
         stock_name_entry = tk.Entry(input_frame, textvariable=self.stock_name_var, font=("Arial", 10), width=15)
         stock_name_entry.grid(row=0, column=3, padx=5, pady=5)
 
         # 预测天数
-        tk.Label(input_frame, text="预测天数:", bg='#f0f0f0', font=("Arial", 10)).grid(row=1, column=0, sticky=tk.W,
+        tk.Label(input_frame, text="Prediction Days:", bg='#f0f0f0', font=("Arial", 10)).grid(row=1, column=0, sticky=tk.W,
                                                                                        padx=5, pady=5)
         self.pred_days_var = tk.StringVar(value="60")
         pred_days_entry = tk.Entry(input_frame, textvariable=self.pred_days_var, font=("Arial", 10), width=15)
         pred_days_entry.grid(row=1, column=1, padx=5, pady=5)
 
         # 历史数据年限
-        tk.Label(input_frame, text="历史年限:", bg='#f0f0f0', font=("Arial", 10)).grid(row=1, column=2, sticky=tk.W,
+        tk.Label(input_frame, text="History Years:", bg='#f0f0f0', font=("Arial", 10)).grid(row=1, column=2, sticky=tk.W,
                                                                                        padx=5, pady=5)
         self.history_years_var = tk.StringVar(value="1")
         history_years_entry = tk.Entry(input_frame, textvariable=self.history_years_var, font=("Arial", 10), width=15)
         history_years_entry.grid(row=1, column=3, padx=5, pady=5)
 
         # 目录设置框架
-        dir_frame = tk.LabelFrame(main_frame, text="目录设置", font=("Arial", 11, "bold"),
+        dir_frame = tk.LabelFrame(main_frame, text="Directory Settings", font=("Arial", 11, "bold"),
                                   bg='#f0f0f0', fg='#2c3e50')
         dir_frame.pack(fill=tk.X, pady=10)
 
         # 数据目录
-        tk.Label(dir_frame, text="数据目录:", bg='#f0f0f0', font=("Arial", 10)).grid(row=0, column=0, sticky=tk.W,
+        tk.Label(dir_frame, text="Data Directory:", bg='#f0f0f0', font=("Arial", 10)).grid(row=0, column=0, sticky=tk.W,
                                                                                      padx=5, pady=5)
         self.data_dir_var = tk.StringVar(value=r"D:\lianghuajiaoyi\Kronos\examples\data")
         data_dir_entry = tk.Entry(dir_frame, textvariable=self.data_dir_var, font=("Arial", 10), width=40)
         data_dir_entry.grid(row=0, column=1, padx=5, pady=5)
-        tk.Button(dir_frame, text="浏览", command=self.browse_data_dir, font=("Arial", 9)).grid(row=0, column=2, padx=5,
+        tk.Button(dir_frame, text="Browse", command=self.browse_data_dir, font=("Arial", 9)).grid(row=0, column=2, padx=5,
                                                                                                 pady=5)
 
         # 输出目录
-        tk.Label(dir_frame, text="输出目录:", bg='#f0f0f0', font=("Arial", 10)).grid(row=1, column=0, sticky=tk.W,
+        tk.Label(dir_frame, text="Output Directory:", bg='#f0f0f0', font=("Arial", 10)).grid(row=1, column=0, sticky=tk.W,
                                                                                      padx=5, pady=5)
         self.output_dir_var = tk.StringVar(value=r"D:\lianghuajiaoyi\Kronos\examples\yuce")
         output_dir_entry = tk.Entry(dir_frame, textvariable=self.output_dir_var, font=("Arial", 10), width=40)
         output_dir_entry.grid(row=1, column=1, padx=5, pady=5)
-        tk.Button(dir_frame, text="浏览", command=self.browse_output_dir, font=("Arial", 9)).grid(row=1, column=2,
+        tk.Button(dir_frame, text="Browse", command=self.browse_output_dir, font=("Arial", 9)).grid(row=1, column=2,
                                                                                                   padx=5, pady=5)
 
         # 功能按钮框架
@@ -146,7 +146,7 @@ class StockPredictorGUI:
         # 预测按钮
         self.predict_button = tk.Button(
             button_frame,
-            text="🚀 开始预测",
+            text="🚀 Start Prediction",
             command=self.start_prediction,
             font=("Arial", 12, "bold"),
             bg='#3498db',
@@ -159,7 +159,7 @@ class StockPredictorGUI:
         # 重置按钮
         reset_button = tk.Button(
             button_frame,
-            text="🔄 重置",
+            text="🔄 Reset",
             command=self.reset_fields,
             font=("Arial", 10),
             bg='#95a5a6',
@@ -172,7 +172,7 @@ class StockPredictorGUI:
         # 退出按钮
         exit_button = tk.Button(
             button_frame,
-            text="❌ 退出",
+            text="❌ Exit",
             command=self.root.quit,
             font=("Arial", 10),
             bg='#e74c3c',
@@ -183,11 +183,11 @@ class StockPredictorGUI:
         exit_button.pack(side=tk.LEFT, padx=10)
 
         # 进度显示
-        self.progress_frame = tk.LabelFrame(main_frame, text="预测进度", font=("Arial", 11, "bold"),
+        self.progress_frame = tk.LabelFrame(main_frame, text="Prediction Progress", font=("Arial", 11, "bold"),
                                             bg='#f0f0f0', fg='#2c3e50')
         self.progress_frame.pack(fill=tk.X, pady=10)
 
-        self.progress_var = tk.StringVar(value="等待开始预测...")
+        self.progress_var = tk.StringVar(value="Waiting to start prediction...")
         progress_label = tk.Label(self.progress_frame, textvariable=self.progress_var, bg='#f0f0f0',
                                   font=("Arial", 10), wraplength=700, justify=tk.LEFT)
         progress_label.pack(padx=10, pady=10, fill=tk.X)
@@ -197,7 +197,7 @@ class StockPredictorGUI:
         self.progress_bar.pack(fill=tk.X, padx=10, pady=5)
 
         # 结果展示区域
-        self.result_frame = tk.LabelFrame(main_frame, text="预测结果", font=("Arial", 11, "bold"),
+        self.result_frame = tk.LabelFrame(main_frame, text="Prediction Results", font=("Arial", 11, "bold"),
                                           bg='#f0f0f0', fg='#2c3e50')
         self.result_frame.pack(fill=tk.BOTH, expand=True, pady=10)
 
@@ -222,13 +222,13 @@ class StockPredictorGUI:
     def reset_fields(self):
         """重置输入字段"""
         self.stock_code_var.set("600580")
-        self.stock_name_var.set("卧龙电驱")
+        self.stock_name_var.set("Wolong Electric Drive")
         self.pred_days_var.set("60")
         self.history_years_var.set("1")
         self.data_dir_var.set(r"D:\lianghuajiaoyi\Kronos\examples\data")
         self.output_dir_var.set(r"D:\lianghuajiaoyi\Kronos\examples\yuce")
         self.result_text.delete(1.0, tk.END)
-        self.progress_var.set("等待开始预测...")
+        self.progress_var.set("Waiting to start prediction...")
 
     def start_prediction(self):
         """开始预测"""
@@ -259,25 +259,25 @@ class StockPredictorGUI:
             history_years = int(self.history_years_var.get())
 
             if not stock_code:
-                messagebox.showerror("错误", "请输入股票代码")
+                messagebox.showerror("Error", "Please enter a stock code")
                 return False
 
             if not stock_name:
-                messagebox.showerror("错误", "请输入股票名称")
+                messagebox.showerror("Error", "Please enter a stock name")
                 return False
 
             if pred_days <= 0 or pred_days > 365:
-                messagebox.showerror("错误", "预测天数应在1-365天之间")
+                messagebox.showerror("Error", "Prediction days must be between 1 and 365")
                 return False
 
             if history_years <= 0 or history_years > 10:
-                messagebox.showerror("错误", "历史年限应在1-10年之间")
+                messagebox.showerror("Error", "History years must be between 1 and 10")
                 return False
 
             return True
 
         except ValueError:
-            messagebox.showerror("错误", "请输入有效的数字")
+            messagebox.showerror("Error", "Please enter valid numbers")
             return False
 
     def run_prediction(self):
@@ -292,7 +292,7 @@ class StockPredictorGUI:
             output_dir = self.output_dir_var.get()
 
             # 更新进度
-            self.update_progress("🎯 开始股票预测流程...")
+            self.update_progress("🎯 Starting stock prediction pipeline...")
 
             # 运行预测
             success, result = run_comprehensive_prediction_gui(
@@ -302,15 +302,15 @@ class StockPredictorGUI:
             )
 
             if success:
-                self.update_progress("✅ 预测完成！")
-                messagebox.showinfo("完成", f"{stock_name}({stock_code})预测完成！\n图表已保存到输出目录。")
+                self.update_progress("✅ Prediction complete!")
+                messagebox.showinfo("Completed", f"{stock_name}({stock_code}) prediction complete!\nCharts have been saved to the output directory.")
             else:
-                self.update_progress("❌ 预测失败")
-                messagebox.showerror("错误", f"预测失败: {result}")
+                self.update_progress("❌ Prediction failed")
+                messagebox.showerror("Error", f"Prediction failed: {result}")
 
         except Exception as e:
-            self.update_progress(f"❌ 预测过程出现错误: {str(e)}")
-            messagebox.showerror("错误", f"预测过程出现错误: {str(e)}")
+            self.update_progress(f"❌ Error during prediction: {str(e)}")
+            messagebox.showerror("Error", f"Error during prediction: {str(e)}")
         finally:
             # 重新启用预测按钮
             self.root.after(0, lambda: self.predict_button.config(state=tk.NORMAL))
@@ -333,7 +333,7 @@ def ensure_output_directory(output_dir):
     """确保输出目录存在，如果不存在则创建"""
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-        print(f"✅ 创建输出目录: {output_dir}")
+        print(f"✅ Created output directory: {output_dir}")
     return output_dir
 
 
@@ -342,13 +342,13 @@ def fetch_real_stock_data(stock_code, period="daily", adjust="qfq"):
     使用AKShare获取真实股票数据
     """
     try:
-        print(f"📡 正在通过AKShare获取 {stock_code} 的真实股票数据...")
+        print(f"📡 Fetching real stock data for {stock_code} via AKShare...")
 
         # 获取股票数据
         df = ak.stock_zh_a_hist(symbol=stock_code, period=period, adjust=adjust)
 
         if df is None or df.empty:
-            print(f"❌ 未获取到 {stock_code} 的数据")
+            print(f"❌ No data received for {stock_code}")
             return None
 
         # 重命名列以统一格式
@@ -377,14 +377,14 @@ def fetch_real_stock_data(stock_code, period="daily", adjust="qfq"):
         # 添加股票代码列
         df['stock_code'] = stock_code
 
-        print(f"✅ 成功获取 {len(df)} 条真实数据")
-        print(f"📈 最新收盘价: {df['close'].iloc[-1]:.2f}元, 涨跌幅: {df['pct_chg'].iloc[-1]:.2f}%")
-        print(f"📅 时间范围: {df['timestamps'].min()} 到 {df['timestamps'].max()}")
+        print(f"✅ Successfully fetched {len(df)} real data records")
+        print(f"📈 Latest close: {df['close'].iloc[-1]:.2f} CNY, change: {df['pct_chg'].iloc[-1]:.2f}%")
+        print(f"📅 Time range: {df['timestamps'].min()} to {df['timestamps'].max()}")
 
         return df
 
     except Exception as e:
-        print(f"❌ AKShare数据获取失败: {e}")
+        print(f"❌ AKShare data fetch failed: {e}")
         return None
 
 
@@ -392,7 +392,7 @@ def get_stock_data_with_retry_all_history(stock_code="600580", retry_count=2):
     """
     优化的数据获取函数 - 优先使用真实API数据
     """
-    print(f"🔄 尝试获取股票 {stock_code} 的真实历史数据...")
+    print(f"🔄 Attempting to fetch real historical data for stock {stock_code}...")
 
     # 优先使用AKShare获取真实数据
     df = fetch_real_stock_data(stock_code, "daily", "qfq")
@@ -400,7 +400,7 @@ def get_stock_data_with_retry_all_history(stock_code="600580", retry_count=2):
     if df is not None:
         return df
     else:
-        print("⚠️ 真实数据获取失败，使用基于真实价格的模拟数据...")
+        print("⚠️ Real data fetch failed; using simulated data based on real prices...")
         return create_realistic_fallback_data(stock_code)
 
 
@@ -410,16 +410,16 @@ def create_realistic_fallback_data(stock_code="600580"):
     """
     # 基于真实市场价格的参考数据
     real_stock_references = {
-        '600580': {'name': '卧龙电驱', 'current_price': 15.20, 'range': (12.0, 20.0)},
-        '300207': {'name': '欣旺达', 'current_price': 33.79, 'range': (28.0, 38.0)},
-        '300418': {'name': '昆仑万维', 'current_price': 48.59, 'range': (40.0, 55.0)},
-        '002354': {'name': '天娱数科', 'current_price': 15.20, 'range': (12.0, 20.0)},
-        '000001': {'name': '平安银行', 'current_price': 12.50, 'range': (10.0, 16.0)},
-        '600036': {'name': '招商银行', 'current_price': 35.80, 'range': (30.0, 42.0)},
+        '600580': {'name': 'Wolong Electric Drive', 'current_price': 15.20, 'range': (12.0, 20.0)},
+        '300207': {'name': 'Sunwoda', 'current_price': 33.79, 'range': (28.0, 38.0)},
+        '300418': {'name': 'Kunlun Tech', 'current_price': 48.59, 'range': (40.0, 55.0)},
+        '002354': {'name': 'Tianyu Digital', 'current_price': 15.20, 'range': (12.0, 20.0)},
+        '000001': {'name': 'Ping An Bank', 'current_price': 12.50, 'range': (10.0, 16.0)},
+        '600036': {'name': 'China Merchants Bank', 'current_price': 35.80, 'range': (30.0, 42.0)},
     }
 
     stock_info = real_stock_references.get(stock_code, {
-        'name': '未知股票',
+        'name': 'Unknown Stock',
         'current_price': 20.0,
         'range': (15.0, 25.0)
     })
@@ -486,7 +486,7 @@ def create_realistic_fallback_data(stock_code="600580"):
         })
 
     df = pd.DataFrame(stock_data)
-    print(f"✅ 已生成基于真实价格的备用数据 {len(df)} 条")
+    print(f"✅ Generated {len(df)} fallback records based on real prices")
     return df
 
 
@@ -499,7 +499,7 @@ def save_all_history_stock_data(df, stock_code, save_dir):
         csv_file = os.path.join(save_dir, f"{stock_code}_stock_data.csv")
         df_reset = df.reset_index()
         df_reset.to_csv(csv_file, encoding='utf-8-sig', index=False)
-        print(f"📁 股票数据已保存: {csv_file}")
+        print(f"📁 Stock data saved: {csv_file}")
         return True
     return False
 
@@ -511,17 +511,17 @@ def get_stock_data(stock_code, data_dir):
     csv_file_path = os.path.join(data_dir, f"{stock_code}_stock_data.csv")
 
     if os.path.exists(csv_file_path):
-        print(f"📁 使用现有数据文件: {csv_file_path}")
+        print(f"📁 Using existing data file: {csv_file_path}")
         return True, csv_file_path
     else:
-        print(f"📡 数据文件不存在，从API获取真实数据...")
+        print(f"📡 Data file not found; fetching real data from the API...")
         df = get_stock_data_with_retry_all_history(stock_code)
 
         if df is not None and not df.empty:
             save_all_history_stock_data(df, stock_code, data_dir)
             return True, csv_file_path
         else:
-            print(f"❌ 无法获取股票数据")
+            print(f"❌ Unable to obtain stock data")
             return False, None
 
 
@@ -529,7 +529,7 @@ def prepare_stock_data(csv_file_path, stock_code, history_years=1):
     """
     准备股票数据，转换为Kronos模型需要的格式
     """
-    print(f"正在加载和预处理股票 {stock_code} 数据...")
+    print(f"Loading and preprocessing data for stock {stock_code}...")
 
     # 读取CSV文件
     df = pd.read_csv(csv_file_path, encoding='utf-8-sig')
@@ -566,19 +566,19 @@ def prepare_stock_data(csv_file_path, stock_code, history_years=1):
         cutoff_date = datetime.now() - timedelta(days=history_years * 365)
         original_count = len(df)
         df = df[df['timestamps'] >= cutoff_date]
-        print(f"📅 使用最近 {history_years} 年数据: {len(df)} 条记录 (从 {original_count} 条中筛选)")
+        print(f"📅 Using data from the last {history_years} year(s): {len(df)} records (filtered from {original_count})")
 
     # 数据验证
-    print(f"🔍 数据验证 - 最近5个交易日收盘价:")
+    print(f"🔍 Data validation - closing prices for the last 5 trading days:")
     recent_prices = df[['timestamps', 'close']].tail()
     for _, row in recent_prices.iterrows():
-        print(f"  {row['timestamps'].strftime('%Y-%m-%d')}: {row['close']:.2f}元")
+        print(f"  {row['timestamps'].strftime('%Y-%m-%d')}: {row['close']:.2f} CNY")
 
     current_price = df['close'].iloc[-1]
-    print(f"✅ 数据加载完成，共 {len(df)} 条记录")
-    print(f"时间范围: {df['timestamps'].min()} 到 {df['timestamps'].max()}")
-    print(f"价格范围: {df['close'].min():.2f} - {df['close'].max():.2f}")
-    print(f"当前价格: {current_price:.2f}元")
+    print(f"✅ Data loaded: {len(df)} records in total")
+    print(f"Time range: {df['timestamps'].min()} to {df['timestamps'].max()}")
+    print(f"Price range: {df['close'].min():.2f} - {df['close'].max():.2f}")
+    print(f"Current price: {current_price:.2f} CNY")
 
     return df
 
@@ -604,11 +604,11 @@ def calculate_prediction_parameters(df, target_days=60):
     lookback = max(100, min(lookback, 400))
     pred_len = max(20, min(pred_len, 120))
 
-    print(f"📊 参数计算:")
-    print(f"  目标预测天数: {target_days} 天（自然日）")
-    print(f"  预计交易日数量: {pred_trading_days} 天")
-    print(f"  回看期数 (lookback): {lookback}")
-    print(f"  预测期数 (pred_len): {pred_len}")
+    print(f"📊 Parameter calculation:")
+    print(f"  Target prediction days: {target_days} calendar days")
+    print(f"  Estimated trading days: {pred_trading_days}")
+    print(f"  Lookback window (lookback): {lookback}")
+    print(f"  Prediction length (pred_len): {pred_len}")
 
     return lookback, pred_len
 
@@ -638,10 +638,10 @@ def generate_trading_dates_only(last_date, pred_len):
             trading_dates.append(current_date)
         current_date += timedelta(days=1)
 
-    print(f"📅 生成的纯交易日: 共 {len(trading_dates)} 天")
+    print(f"📅 Generated trading days only: {len(trading_dates)} in total")
     if trading_dates:
-        print(f"   起始: {trading_dates[0].strftime('%Y-%m-%d')}")
-        print(f"   结束: {trading_dates[-1].strftime('%Y-%m-%d')}")
+        print(f"   Start: {trading_dates[0].strftime('%Y-%m-%d')}")
+        print(f"   End: {trading_dates[-1].strftime('%Y-%m-%d')}")
 
     return trading_dates
 
@@ -677,6 +677,18 @@ def calculate_optimal_interval(min_val, max_val):
 
 
 # ==================== 增强版市场因素分析器 ====================
+# English display names for sector keys used in matching logic
+SECTOR_NAME_EN = {
+    '机器人': 'Robotics',
+    '半导体': 'Semiconductors',
+    '人工智能': 'Artificial Intelligence',
+    '低空经济': 'Low-Altitude Economy',
+    '新能源': 'New Energy',
+    '医药': 'Pharmaceuticals',
+    '传统行业': 'Traditional Industries',
+}
+
+
 class EnhancedMarketFactorAnalyzer:
     """增强版市场因素分析器 - 整合更多维度的市场因素"""
 
@@ -691,19 +703,19 @@ class EnhancedMarketFactorAnalyzer:
         分析大盘趋势 - 多指数综合分析
         """
         try:
-            print(f"📊 综合分析大盘趋势...")
+            print(f"📊 Comprehensively analyzing the market trend...")
 
             market_analysis = {}
 
             for index_code in index_codes:
-                index_name = "上证指数" if index_code == "000001" else "深证成指"
-                print(f"  分析{index_name}({index_code})...")
+                index_name = "Shanghai Composite" if index_code == "000001" else "Shenzhen Component"
+                print(f"  Analyzing {index_name}({index_code})...")
 
                 # 获取指数数据
                 index_df = ak.stock_zh_index_hist(symbol=index_code, period="daily")
 
                 if index_df is None or index_df.empty:
-                    print(f"  ❌ 无法获取{index_name}数据")
+                    print(f"  ❌ Unable to fetch data for {index_name}")
                     continue
 
                 # 重命名列
@@ -743,7 +755,7 @@ class EnhancedMarketFactorAnalyzer:
                     'trend_strength': trend_strength,
                     'current_close': current_data['close'],
                     'price_change_pct': ((current_data['close'] - prev_data['close']) / prev_data['close']) * 100,
-                    'market_status': '主升浪' if is_main_uptrend else '震荡调整'
+                    'market_status': 'Main Uptrend' if is_main_uptrend else 'Consolidation'
                 }
 
             # 综合判断
@@ -756,16 +768,16 @@ class EnhancedMarketFactorAnalyzer:
                     'overall_is_main_uptrend': overall_uptrend,
                     'overall_trend_strength': avg_trend_strength,
                     'detailed_analysis': market_analysis,
-                    'market_status': '主升浪' if overall_uptrend else '震荡调整'
+                    'market_status': 'Main Uptrend' if overall_uptrend else 'Consolidation'
                 }
 
-                print(f"✅ 大盘分析完成: {final_analysis['market_status']}, 综合趋势强度: {avg_trend_strength:.2f}")
+                print(f"✅ Market analysis complete: {final_analysis['market_status']}, overall trend strength: {avg_trend_strength:.2f}")
                 return final_analysis
 
             return self._get_default_market_analysis()
 
         except Exception as e:
-            print(f"❌ 大盘分析错误: {e}")
+            print(f"❌ Market analysis error: {e}")
             return self._get_default_market_analysis()
 
     def analyze_sector_resonance(self, stock_code):
@@ -773,10 +785,10 @@ class EnhancedMarketFactorAnalyzer:
         分析板块共振效应 - 增强版行业分析
         """
         try:
-            print(f"🔄 分析板块共振效应...")
+            print(f"🔄 Analyzing sector resonance...")
 
             # 获取股票所属行业和概念
-            industry = "未知"
+            industry = "Unknown"
             concepts = []
 
             try:
@@ -791,12 +803,12 @@ class EnhancedMarketFactorAnalyzer:
             # 热门板块和概念映射
             hot_sectors = {
                 '机器人': {'momentum': 0.85, 'limit_up_stocks': 18, 'active': True,
-                           'description': '人形机器人、工业自动化'},
-                '半导体': {'momentum': 0.8, 'limit_up_stocks': 15, 'active': True, 'description': '芯片国产替代'},
-                '人工智能': {'momentum': 0.75, 'limit_up_stocks': 12, 'active': True, 'description': 'AI大模型、算力'},
-                '低空经济': {'momentum': 0.7, 'limit_up_stocks': 10, 'active': True, 'description': '无人机、eVTOL'},
-                '新能源': {'momentum': 0.6, 'limit_up_stocks': 8, 'active': True, 'description': '光伏、储能'},
-                '医药': {'momentum': 0.5, 'limit_up_stocks': 5, 'active': False, 'description': '创新药'}
+                           'description': 'Humanoid robots, industrial automation'},
+                '半导体': {'momentum': 0.8, 'limit_up_stocks': 15, 'active': True, 'description': 'Domestic chip substitution'},
+                '人工智能': {'momentum': 0.75, 'limit_up_stocks': 12, 'active': True, 'description': 'AI large models, computing power'},
+                '低空经济': {'momentum': 0.7, 'limit_up_stocks': 10, 'active': True, 'description': 'Drones, eVTOL'},
+                '新能源': {'momentum': 0.6, 'limit_up_stocks': 8, 'active': True, 'description': 'Solar, energy storage'},
+                '医药': {'momentum': 0.5, 'limit_up_stocks': 5, 'active': False, 'description': 'Innovative drugs'}
             }
 
             # 判断当前股票所属热门板块
@@ -821,7 +833,7 @@ class EnhancedMarketFactorAnalyzer:
             else:
                 resonance_score = 0.5
                 is_sector_hot = False
-                main_sector = {'sector': '传统行业', 'momentum': 0.5, 'description': '无热门概念'}
+                main_sector = {'sector': '传统行业', 'momentum': 0.5, 'description': 'No hot concept'}
 
             analysis = {
                 'industry': industry,
@@ -832,11 +844,11 @@ class EnhancedMarketFactorAnalyzer:
                 'sector_count': len(matched_sectors)
             }
 
-            print(f"✅ 板块分析完成: {industry}, 匹配{len(matched_sectors)}个热门板块, 共振分数: {resonance_score:.2f}")
+            print(f"✅ Sector analysis complete: {SECTOR_NAME_EN.get(industry, industry)}, matched {len(matched_sectors)} hot sector(s), resonance score: {resonance_score:.2f}")
             return analysis
 
         except Exception as e:
-            print(f"❌ 板块分析错误: {e}")
+            print(f"❌ Sector analysis error: {e}")
             return self._get_default_sector_analysis()
 
     def analyze_macro_factors(self):
@@ -844,52 +856,52 @@ class EnhancedMarketFactorAnalyzer:
         分析宏观因素 - 结合国内外政策
         """
         try:
-            print(f"🌍 分析宏观因素...")
+            print(f"🌍 Analyzing macro factors...")
 
             # 美国降息周期分析 - 基于最新信息
             us_rate_analysis = {
                 'current_rate': 4.25,  # 联邦基金利率目标区间4.00%-4.25%
-                'trend': '降息周期',
-                'recent_cut': '2025年9月降息25个基点',
+                'trend': 'Rate Cut Cycle',
+                'recent_cut': '25 bps cut in September 2025',
                 'expected_cuts_2025': 2,  # 市场预期2025年还有两次降息
                 'expected_cuts_2026': 2,
                 'impact_on_emerging_markets': 'positive',
                 'usd_index_support': 95.0,  # 美元指数短期支撑位
-                'analysis': '美联储开启宽松周期，利好全球流动性'
+                'analysis': 'The Fed has begun an easing cycle, supportive of global liquidity'
             }
 
             # 国内政策因素 - 基于最新政策
             domestic_policy = {
-                'monetary_policy': '稳健偏松',
-                'fiscal_policy': '积极财政',
-                'market_liquidity': '合理充裕',
-                'industrial_policy': '设备更新、以旧换新',  # 大规模设备更新政策
-                'employment_policy': '稳就业政策加力',  # 国务院稳就业政策
-                'analysis': '政策组合拳发力，经济稳中向好'
+                'monetary_policy': 'Moderately accommodative',
+                'fiscal_policy': 'Proactive fiscal policy',
+                'market_liquidity': 'Adequate',
+                'industrial_policy': 'Equipment renewal, trade-in program',  # 大规模设备更新政策
+                'employment_policy': 'Stronger employment support',  # 国务院稳就业政策
+                'analysis': 'Coordinated policy measures are supporting steady economic improvement'
             }
 
             # 行业政策支持
             industry_policy = {
-                'robot_policy': '机器人产业政策支持',
-                'chip_policy': '国产替代加速推进',
-                'AI_policy': '人工智能发展规划',
-                'low_altitude': '低空经济发展规划'
+                'robot_policy': 'Policy support for the robotics industry',
+                'chip_policy': 'Accelerated domestic substitution',
+                'AI_policy': 'Artificial intelligence development plan',
+                'low_altitude': 'Low-altitude economy development plan'
             }
 
             macro_analysis = {
                 'us_rate_cycle': us_rate_analysis,
                 'domestic_policy': domestic_policy,
                 'industry_policy': industry_policy,
-                'global_liquidity_outlook': '改善',
+                'global_liquidity_outlook': 'Improving',
                 'overall_macro_score': 0.75  # 宏观环境整体偏积极
             }
 
             print(
-                f"✅ 宏观分析完成: 美国{us_rate_analysis['trend']}, 国内政策积极, 宏观评分: {macro_analysis['overall_macro_score']:.2f}")
+                f"✅ Macro analysis complete: US {us_rate_analysis['trend']}, proactive domestic policy, macro score: {macro_analysis['overall_macro_score']:.2f}")
             return macro_analysis
 
         except Exception as e:
-            print(f"❌ 宏观分析错误: {e}")
+            print(f"❌ Macro analysis error: {e}")
             return self._get_default_macro_analysis()
 
     def analyze_company_fundamentals(self, stock_code):
@@ -897,50 +909,50 @@ class EnhancedMarketFactorAnalyzer:
         分析公司基本面 - 针对特定股票
         """
         try:
-            print(f"🏢 分析公司基本面...")
+            print(f"🏢 Analyzing company fundamentals...")
 
             # 卧龙电驱特殊分析
             if stock_code == '600580':
                 fundamentals = {
-                    'company_name': '卧龙电驱',
-                    'business_areas': ['工业电机', '机器人关键部件', '航空电机', '新能源汽车驱动'],
+                    'company_name': 'Wolong Electric Drive',
+                    'business_areas': ['Industrial motors', 'Key robot components', 'Aviation motors', 'New energy vehicle drives'],
                     'recent_developments': [
-                        '与智元机器人实现双向持股，推进具身智能机器人技术研发',
-                        '成立浙江龙飞电驱，专注航空电机业务',
-                        '发布AI外骨骼机器人及灵巧手',
-                        '布局高爆发关节模组、伺服驱动器等人形机器人关键部件'
+                        'Cross-shareholding with Zhiyuan Robotics to advance embodied intelligent robotics R&D',
+                        'Established Zhejiang Longfei Electric Drive, focused on aviation motor business',
+                        'Launched AI exoskeleton robots and dexterous hands',
+                        'Building key humanoid robot components such as high-torque joint modules and servo drives'
                     ],
                     'growth_drivers': [
-                        '设备更新政策推动工业电机需求',
-                        '机器人产业快速发展',
-                        '低空经济政策支持',
-                        '出海战略加速'
+                        'Equipment renewal policy boosting industrial motor demand',
+                        'Rapid growth of the robotics industry',
+                        'Policy support for the low-altitude economy',
+                        'Accelerating overseas expansion strategy'
                     ],
                     'risk_factors': [
-                        '机器人业务营收占比仅2.71%，占比较低',
-                        '工业需求景气度波动',
-                        '原料价格波动风险'
+                        'Robotics business accounts for only 2.71% of revenue',
+                        'Fluctuations in industrial demand',
+                        'Raw material price volatility risk'
                     ],
-                    'investment_rating': '积极关注',
+                    'investment_rating': 'Positive Watch',
                     'fundamental_score': 0.7
                 }
             else:
                 # 其他股票的基础分析
                 fundamentals = {
-                    'company_name': '未知',
+                    'company_name': 'Unknown',
                     'business_areas': [],
                     'recent_developments': [],
                     'growth_drivers': [],
                     'risk_factors': [],
-                    'investment_rating': '中性',
+                    'investment_rating': 'Neutral',
                     'fundamental_score': 0.5
                 }
 
-            print(f"✅ 基本面分析完成: {fundamentals['company_name']}, 评分: {fundamentals['fundamental_score']:.2f}")
+            print(f"✅ Fundamental analysis complete: {fundamentals['company_name']}, score: {fundamentals['fundamental_score']:.2f}")
             return fundamentals
 
         except Exception as e:
-            print(f"❌ 基本面分析错误: {e}")
+            print(f"❌ Fundamental analysis error: {e}")
             return self._get_default_fundamental_analysis()
 
     def _calculate_trend_strength(self, df):
@@ -960,15 +972,15 @@ class EnhancedMarketFactorAnalyzer:
         return {
             'overall_is_main_uptrend': False,
             'overall_trend_strength': 0.5,
-            'market_status': '未知',
+            'market_status': 'Unknown',
             'detailed_analysis': {}
         }
 
     def _get_default_sector_analysis(self):
         return {
-            'industry': '未知',
+            'industry': 'Unknown',
             'matched_sectors': [],
-            'main_sector': {'sector': '未知', 'momentum': 0.5, 'description': ''},
+            'main_sector': {'sector': 'Unknown', 'momentum': 0.5, 'description': ''},
             'is_sector_hot': False,
             'resonance_score': 0.5,
             'sector_count': 0
@@ -976,19 +988,19 @@ class EnhancedMarketFactorAnalyzer:
 
     def _get_default_macro_analysis(self):
         return {
-            'us_rate_cycle': {'trend': '未知', 'expected_cuts_2025': 0},
-            'domestic_policy': {'monetary_policy': '中性'},
+            'us_rate_cycle': {'trend': 'Unknown', 'expected_cuts_2025': 0},
+            'domestic_policy': {'monetary_policy': 'Neutral'},
             'overall_macro_score': 0.5
         }
 
     def _get_default_fundamental_analysis(self):
         return {
-            'company_name': '未知',
+            'company_name': 'Unknown',
             'business_areas': [],
             'recent_developments': [],
             'growth_drivers': [],
             'risk_factors': [],
-            'investment_rating': '中性',
+            'investment_rating': 'Neutral',
             'fundamental_score': 0.5
         }
 
@@ -998,7 +1010,7 @@ def smooth_prediction_results(prediction_df, historical_df, smooth_factor=0.3):
     """
     🎯 优化预测结果的平滑处理，避免剧烈波动
     """
-    print("🔄 应用预测结果平滑处理...")
+    print("🔄 Applying smoothing to prediction results...")
 
     smoothed_df = prediction_df.copy()
 
@@ -1038,7 +1050,7 @@ def smooth_prediction_results(prediction_df, historical_df, smooth_factor=0.3):
 
         smoothed_df['volume'] = np.clip(adjusted_volume, volume_min, volume_max)
 
-    print("✅ 预测结果平滑完成")
+    print("✅ Prediction smoothing complete")
     return smoothed_df
 
 
@@ -1071,7 +1083,7 @@ def apply_post_holiday_adjustment(prediction_df, future_dates, holiday_periods):
     """
     🎯 修复版：应用节后调整，避免国庆后异常下跌
     """
-    print("🔄 应用节后日历效应调整...")
+    print("🔄 Applying post-holiday calendar effects...")
 
     adjusted_df = prediction_df.copy()
 
@@ -1097,7 +1109,7 @@ def apply_post_holiday_adjustment(prediction_df, future_dates, holiday_periods):
                     for idx in post_holiday_indices:
                         adjusted_df.iloc[idx][col] = adjusted_df.iloc[idx][col] * (1 + effect_strength)
 
-    print("✅ 节后调整完成")
+    print("✅ Post-holiday adjustment complete")
     return adjusted_df
 
 
@@ -1106,7 +1118,7 @@ def validate_prediction_results(historical_df, prediction_df, max_price_change=0
     """
     🎯 验证预测结果的合理性，避免异常价格波动
     """
-    print("🔍 验证预测结果合理性...")
+    print("🔍 Validating prediction plausibility...")
 
     validated_df = prediction_df.copy()
     current_price = historical_df['close'].iloc[-1]
@@ -1130,9 +1142,9 @@ def validate_prediction_results(historical_df, prediction_df, max_price_change=0
                     corrected_price = current_price * (1 + (predicted_price / current_price - 1) * correction_factor)
                     validated_df.iloc[i][col] = corrected_price
 
-                    print(f"⚠️  修正异常{col}价格: {predicted_price:.2f} -> {corrected_price:.2f}")
+                    print(f"⚠️  Corrected anomalous {col} price: {predicted_price:.2f} -> {corrected_price:.2f}")
 
-    print("✅ 预测结果验证完成")
+    print("✅ Prediction validation complete")
     return validated_df
 
 
@@ -1157,49 +1169,49 @@ def run_comprehensive_prediction_gui(stock_code, stock_name, data_dir, pred_days
         # 初始化市场分析器
         market_analyzer = EnhancedMarketFactorAnalyzer()
 
-        update_progress(f"🎯 开始 {stock_name}({stock_code}) 预测流程")
+        update_progress(f"🎯 Starting prediction pipeline for {stock_name}({stock_code})")
         update_progress("=" * 50)
 
         # 1. 获取数据
-        update_progress("\n步骤1: 获取股票数据...")
+        update_progress("\nStep 1: Fetching stock data...")
         success, csv_file_path = get_stock_data(stock_code, data_dir)
         if not success:
-            update_result("❌ 无法获取股票数据，预测终止")
-            return False, "无法获取股票数据"
+            update_result("❌ Unable to obtain stock data; prediction aborted")
+            return False, "Unable to obtain stock data"
 
         # 2. 加载模型和分词器
-        update_progress("\n步骤2: 加载Kronos模型和分词器...")
+        update_progress("\nStep 2: Loading the Kronos model and tokenizer...")
         try:
             tokenizer = KronosTokenizer.from_pretrained("NeoQuasar/Kronos-Tokenizer-base")
             model = Kronos.from_pretrained("NeoQuasar/Kronos-base")
-            update_progress("✅ 模型加载完成 - 使用Kronos-base模型")
+            update_progress("✅ Model loaded - using Kronos-base")
         except Exception as e:
-            error_msg = f"❌ 模型加载失败: {e}"
+            error_msg = f"❌ Model loading failed: {e}"
             update_result(error_msg)
-            update_progress("⚠️ 预测功能不可用，请检查模型安装")
+            update_progress("⚠️ Prediction features unavailable; please check the model installation")
             return False, error_msg
 
         # 3. 实例化预测器
-        update_progress("步骤3: 初始化预测器...")
+        update_progress("Step 3: Initializing the predictor...")
         predictor = KronosPredictor(model, tokenizer, device="cuda:0", max_context=512)
-        update_progress("✅ 预测器初始化完成")
+        update_progress("✅ Predictor initialized")
 
         # 4. 准备数据
-        update_progress("步骤4: 准备股票数据...")
+        update_progress("Step 4: Preparing stock data...")
         df = prepare_stock_data(csv_file_path, stock_code, history_years)
 
         # 5. 计算预测参数
-        update_progress("步骤5: 计算预测参数...")
+        update_progress("Step 5: Calculating prediction parameters...")
         lookback, pred_len = calculate_prediction_parameters(df, target_days=pred_days)
 
         if pred_len <= 0:
-            update_result("❌ 数据量不足，无法进行预测")
-            return False, "数据量不足"
+            update_result("❌ Insufficient data for prediction")
+            return False, "Insufficient data"
 
-        update_progress(f"✅ 最终参数 - 回看期: {lookback}, 预测期: {pred_len}")
+        update_progress(f"✅ Final parameters - lookback: {lookback}, prediction length: {pred_len}")
 
         # 6. 准备输入数据
-        update_progress("步骤6: 准备输入数据...")
+        update_progress("Step 6: Preparing input data...")
         x_df = df.loc[-lookback:, ['open', 'high', 'low', 'close', 'volume', 'amount']].reset_index(drop=True)
         x_timestamp = df.loc[-lookback:, 'timestamps'].reset_index(drop=True)
 
@@ -1208,16 +1220,16 @@ def run_comprehensive_prediction_gui(stock_code, stock_name, data_dir, pred_days
         future_dates = generate_trading_dates_only(last_historical_date, pred_len)
 
         if len(future_dates) < pred_len:
-            update_progress(f"⚠️ 警告：只生成了 {len(future_dates)} 个交易日，少于请求的 {pred_len} 天")
+            update_progress(f"⚠️ Warning: only {len(future_dates)} trading days were generated, fewer than the requested {pred_len}")
             pred_len = len(future_dates)
 
-        update_progress(f"输入数据形状: {x_df.shape}")
-        update_progress(f"历史数据时间范围: {x_timestamp.iloc[0]} 到 {x_timestamp.iloc[-1]}")
+        update_progress(f"Input data shape: {x_df.shape}")
+        update_progress(f"Historical data time range: {x_timestamp.iloc[0]} to {x_timestamp.iloc[-1]}")
         if future_dates:
-            update_progress(f"预测时间范围: {future_dates[0]} 到 {future_dates[-1]}")
+            update_progress(f"Prediction time range: {future_dates[0]} to {future_dates[-1]}")
 
         # 7. 执行基础预测
-        update_progress("步骤7: 执行基础价格预测...")
+        update_progress("Step 7: Running base price prediction...")
         pred_df = predictor.predict(
             df=x_df,
             x_timestamp=x_timestamp,
@@ -1229,15 +1241,15 @@ def run_comprehensive_prediction_gui(stock_code, stock_name, data_dir, pred_days
             verbose=True
         )
 
-        update_progress("✅ 基础预测完成")
+        update_progress("✅ Base prediction complete")
 
         # 🎯 新增：对基础预测进行合理性检查
-        update_progress("步骤7.2: 验证预测结果合理性...")
+        update_progress("Step 7.2: Validating prediction plausibility...")
         historical_df_for_validation = df.loc[-lookback:].reset_index(drop=True)
         validated_pred_df = validate_prediction_results(historical_df_for_validation, pred_df)
 
         # 🎯 新增：对基础预测进行平滑处理
-        update_progress("步骤7.5: 对预测结果进行平滑优化...")
+        update_progress("Step 7.5: Smoothing prediction results...")
         smoothed_pred_df = smooth_prediction_results(validated_pred_df, historical_df_for_validation)
 
         # 🎯 修复：应用节后调整（特别是国庆节后）
@@ -1253,7 +1265,7 @@ def run_comprehensive_prediction_gui(stock_code, stock_name, data_dir, pred_days
         adjusted_pred_df = apply_post_holiday_adjustment(smoothed_pred_df, future_dates, holiday_periods)
 
         # 8. 使用多维度市场因素增强预测
-        update_progress("步骤8: 应用多维度市场因素增强预测...")
+        update_progress("Step 8: Enhancing prediction with multi-dimensional market factors...")
         enhanced_pred_df, enhancement_info = enhance_prediction_with_market_factors(
             df.loc[-lookback:].reset_index(drop=True),
             adjusted_pred_df,  # 使用平滑调整后的预测结果
@@ -1265,11 +1277,11 @@ def run_comprehensive_prediction_gui(stock_code, stock_name, data_dir, pred_days
         enhancement_info['enhanced_prediction'] = enhanced_pred_df
 
         # 9. 创建综合市场分析报告
-        update_progress("步骤9: 创建市场分析报告...")
+        update_progress("Step 9: Creating the market analysis report...")
         market_report = create_comprehensive_market_report(enhancement_info, output_dir, stock_code)
 
         # 10. 生成预测图表
-        update_progress("步骤10: 生成预测图表...")
+        update_progress("Step 10: Generating prediction charts...")
         historical_df = df.loc[-lookback:].reset_index(drop=True)
         chart_path = plot_optimized_prediction_gui(
             historical_df, adjusted_pred_df, enhanced_pred_df, future_dates,
@@ -1277,7 +1289,7 @@ def run_comprehensive_prediction_gui(stock_code, stock_name, data_dir, pred_days
         )
 
         # 11. 生成预测报告
-        update_progress("步骤11: 生成预测报告...")
+        update_progress("Step 11: Generating the prediction report...")
         if len(enhanced_pred_df) > 0:
             current_price = historical_df['close'].iloc[-1]
             base_predicted_price = adjusted_pred_df['close'].iloc[-1] if len(adjusted_pred_df) > 0 else current_price
@@ -1287,37 +1299,37 @@ def run_comprehensive_prediction_gui(stock_code, stock_name, data_dir, pred_days
             enhanced_change_pct = (enhanced_predicted_price / current_price - 1) * 100
 
             # 输出预测结果
-            update_result(f"\n📈 {stock_name}({stock_code}) 预测报告")
+            update_result(f"\n📈 {stock_name}({stock_code}) Prediction Report")
             update_result("=" * 50)
-            update_result(f"当前价格: {current_price:.2f} 元")
-            update_result(f"平滑预测价格: {base_predicted_price:.2f} 元 ({base_change_pct:+.2f}%)")
-            update_result(f"增强预测价格: {enhanced_predicted_price:.2f} 元 ({enhanced_change_pct:+.2f}%)")
-            update_result(f"市场因素调整因子: {enhancement_info['adjustment_factor']:.4f}")
-            update_result(f"大盘状态: {enhancement_info['market_analysis']['market_status']}")
-            update_result(f"板块共振: {enhancement_info['sector_analysis']['main_sector']['sector']}")
-            update_result(f"宏观环境: 美国{enhancement_info['macro_analysis']['us_rate_cycle']['trend']}")
-            update_result(f"公司评级: {enhancement_info['fundamental_analysis']['investment_rating']}")
+            update_result(f"Current price: {current_price:.2f} CNY")
+            update_result(f"Smoothed predicted price: {base_predicted_price:.2f} CNY ({base_change_pct:+.2f}%)")
+            update_result(f"Enhanced predicted price: {enhanced_predicted_price:.2f} CNY ({enhanced_change_pct:+.2f}%)")
+            update_result(f"Market factor adjustment: {enhancement_info['adjustment_factor']:.4f}")
+            update_result(f"Market status: {enhancement_info['market_analysis']['market_status']}")
+            update_result(f"Sector resonance: {SECTOR_NAME_EN.get(enhancement_info['sector_analysis']['main_sector']['sector'], enhancement_info['sector_analysis']['main_sector']['sector'])}")
+            update_result(f"Macro environment: US {enhancement_info['macro_analysis']['us_rate_cycle']['trend']}")
+            update_result(f"Company rating: {enhancement_info['fundamental_analysis']['investment_rating']}")
 
             # 保存详细预测数据
             prediction_details = pd.DataFrame({
-                '日期': future_dates,
-                '平滑预测收盘价': adjusted_pred_df['close'].values if len(
+                'Date': future_dates,
+                'Smoothed Predicted Close': adjusted_pred_df['close'].values if len(
                     adjusted_pred_df) > 0 else [current_price] * len(future_dates),
-                '增强预测收盘价': enhanced_pred_df['close'].values,
-                '预测成交量': enhanced_pred_df['volume'].values
+                'Enhanced Predicted Close': enhanced_pred_df['close'].values,
+                'Predicted Volume': enhanced_pred_df['volume'].values
             })
 
             prediction_file = os.path.join(output_dir, f'{stock_code}_comprehensive_predictions.csv')
             prediction_details.to_csv(prediction_file, index=False, encoding='utf-8-sig')
-            update_progress(f"💾 详细预测数据已保存: {prediction_file}")
+            update_progress(f"💾 Detailed prediction data saved: {prediction_file}")
 
-        update_progress(f"\n🎉 {stock_name}({stock_code}) 预测完成!")
-        update_progress(f"📊 预测图表: {chart_path}")
+        update_progress(f"\n🎉 {stock_name}({stock_code}) prediction complete!")
+        update_progress(f"📊 Prediction chart: {chart_path}")
 
-        return True, "预测完成"
+        return True, "Prediction complete"
 
     except Exception as e:
-        error_msg = f"❌ 预测过程中出现错误: {e}"
+        error_msg = f"❌ Error during prediction: {e}"
         update_result(error_msg)
         import traceback
         traceback.print_exc()
@@ -1328,7 +1340,7 @@ def enhance_prediction_with_market_factors(historical_df, prediction_df, stock_c
     """
     使用市场因素增强预测结果
     """
-    print("\n🎯 使用市场因素增强预测...")
+    print("\n🎯 Enhancing prediction with market factors...")
 
     # 获取各类市场分析
     market_analysis = market_analyzer.analyze_market_trend()
@@ -1341,7 +1353,7 @@ def enhance_prediction_with_market_factors(historical_df, prediction_df, stock_c
         market_analysis, sector_analysis, macro_analysis, fundamental_analysis
     )
 
-    print(f"📈 综合调整因子: {adjustment_factor:.4f}")
+    print(f"📈 Combined adjustment factor: {adjustment_factor:.4f}")
 
     # 应用调整到预测结果
     enhanced_prediction = prediction_df.copy()
@@ -1395,7 +1407,7 @@ def calculate_enhanced_adjustment_factor(market_analysis, sector_analysis, macro
 
     # 4. 美国降息周期特殊影响 (权重10%)
     us_rate_trend = macro_analysis['us_rate_cycle']['trend']
-    if us_rate_trend == '降息周期':
+    if us_rate_trend == 'Rate Cut Cycle':
         expected_cuts = macro_analysis['us_rate_cycle']['expected_cuts_2025']
         base_factor *= (1 + expected_cuts * 0.015)
 
@@ -1426,7 +1438,7 @@ def create_comprehensive_market_report(enhancement_info, output_dir, stock_code)
     with open(report_file, 'w', encoding='utf-8') as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
 
-    print(f"📋 综合分析报告已保存: {report_file}")
+    print(f"📋 Comprehensive analysis report saved: {report_file}")
     return report
 
 
@@ -1448,7 +1460,7 @@ def plot_optimized_prediction_gui(historical_df, base_pred_df, enhanced_pred_df,
 
     # 创建图表
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
-    fig.suptitle(f'{stock_name}({stock_code}) - 优化版交易日预测图表', fontsize=16, fontweight='bold')
+    fig.suptitle(f'{stock_name}({stock_code}) - Optimized Trading-Day Prediction Chart', fontsize=16, fontweight='bold')
 
     # 设置背景色
     fig.patch.set_facecolor('white')
@@ -1463,25 +1475,25 @@ def plot_optimized_prediction_gui(historical_df, base_pred_df, enhanced_pred_df,
 
     # 绘制历史价格
     ax1.plot(historical_df['timestamps'], historical_df['close'],
-             color=colors['historical'], linewidth=2.5, label='历史价格')
+             color=colors['historical'], linewidth=2.5, label='Historical Price')
 
     # 绘制预测价格
     if len(future_trading_dates) > 0:
         # 绘制基础预测
         ax1.plot(future_trading_dates, base_pred_df['close'],
-                 color=colors['prediction'], linewidth=2, label='平滑预测', linestyle='--')
+                 color=colors['prediction'], linewidth=2, label='Smoothed Prediction', linestyle='--')
 
         # 绘制增强预测
         ax1.plot(future_trading_dates, enhanced_pred_df['close'],
-                 color=colors['enhanced'], linewidth=2.5, label='增强预测')
+                 color=colors['enhanced'], linewidth=2.5, label='Enhanced Prediction')
 
         # 🎯 修复：使用更安全的关键日期标记
         mark_key_dates_safe(ax1, future_trading_dates, enhanced_pred_df)
 
-    ax1.set_ylabel('收盘价 (元)', fontsize=12, fontweight='bold')
+    ax1.set_ylabel('Close Price (CNY)', fontsize=12, fontweight='bold')
     ax1.legend(loc='upper left', fontsize=10)
     ax1.grid(True, color=colors['grid'], alpha=0.7)
-    ax1.set_title(f'价格走势预测 - 当前价: {current_price:.2f}元', fontweight='bold', fontsize=13)
+    ax1.set_title(f'Price Trend Prediction - Current: {current_price:.2f} CNY', fontweight='bold', fontsize=13)
 
     # 🎯 优化2: 使用每周标记，避免过于密集
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
@@ -1490,48 +1502,48 @@ def plot_optimized_prediction_gui(historical_df, base_pred_df, enhanced_pred_df,
 
     # 2. 成交量图表
     ax2.bar(historical_df['timestamps'], historical_df['volume'],
-            alpha=0.6, color=colors['historical'], label='历史成交量')
+            alpha=0.6, color=colors['historical'], label='Historical Volume')
 
     if len(future_trading_dates) > 0:
         ax2.bar(future_trading_dates, enhanced_pred_df['volume'],
-                alpha=0.6, color=colors['enhanced'], label='预测成交量')
+                alpha=0.6, color=colors['enhanced'], label='Predicted Volume')
 
-    ax2.set_ylabel('成交量', fontsize=12, fontweight='bold')
+    ax2.set_ylabel('Volume', fontsize=12, fontweight='bold')
     ax2.legend(loc='upper left', fontsize=10)
     ax2.grid(True, color=colors['grid'], alpha=0.7)
-    ax2.set_title('成交量预测', fontweight='bold', fontsize=13)
+    ax2.set_title('Volume Prediction', fontweight='bold', fontsize=13)
     ax2.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
     ax2.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO, interval=2))
     plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45, fontsize=9)
 
     # 3. 价格变化率图表
     ax3.plot(historical_df['timestamps'], historical_df['close'].pct_change() * 100,
-             color=colors['historical'], linewidth=1.5, label='历史涨跌幅', alpha=0.7)
+             color=colors['historical'], linewidth=1.5, label='Historical Daily Change', alpha=0.7)
 
     if len(future_trading_dates) > 0:
         pred_returns = enhanced_pred_df['close'].pct_change() * 100
         ax3.plot(future_trading_dates, pred_returns,
-                 color=colors['enhanced'], linewidth=2, label='预测涨跌幅')
+                 color=colors['enhanced'], linewidth=2, label='Predicted Daily Change')
 
         # 添加零线参考
         ax3.axhline(y=0, color='red', linestyle='-', alpha=0.3, linewidth=1)
 
-    ax3.set_ylabel('日涨跌幅 (%)', fontsize=12, fontweight='bold')
+    ax3.set_ylabel('Daily Change (%)', fontsize=12, fontweight='bold')
     ax3.legend(loc='upper left', fontsize=10)
     ax3.grid(True, color=colors['grid'], alpha=0.7)
-    ax3.set_title('价格变化率分析', fontweight='bold', fontsize=13)
+    ax3.set_title('Price Change Rate Analysis', fontweight='bold', fontsize=13)
     ax3.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
     ax3.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO, interval=2))
     plt.setp(ax3.xaxis.get_majorticklabels(), rotation=45, fontsize=9)
 
     # 4. 市场因素分析
     if enhancement_info:
-        factors = ['大盘趋势', '板块共振', '宏观环境', '美国降息', '基本面']
+        factors = ['Market Trend', 'Sector Resonance', 'Macro Environment', 'US Rate Cut', 'Fundamentals']
         scores = [
             enhancement_info['market_analysis']['overall_trend_strength'],
             enhancement_info['sector_analysis']['resonance_score'],
             enhancement_info['macro_analysis']['overall_macro_score'],
-            0.7 if enhancement_info['macro_analysis']['us_rate_cycle']['trend'] == '降息周期' else 0.3,
+            0.7 if enhancement_info['macro_analysis']['us_rate_cycle']['trend'] == 'Rate Cut Cycle' else 0.3,
             enhancement_info['fundamental_analysis']['fundamental_score']
         ]
 
@@ -1539,8 +1551,8 @@ def plot_optimized_prediction_gui(historical_df, base_pred_df, enhanced_pred_df,
 
         bars = ax4.bar(factors, scores, color=colors_bars, alpha=0.8, edgecolor='black', linewidth=1)
         ax4.set_ylim(0, 1)
-        ax4.set_ylabel('评分', fontsize=12, fontweight='bold')
-        ax4.set_title('市场因素评分分析', fontweight='bold', fontsize=13)
+        ax4.set_ylabel('Score', fontsize=12, fontweight='bold')
+        ax4.set_title('Market Factor Score Analysis', fontweight='bold', fontsize=13)
         ax4.grid(True, alpha=0.3, axis='y')
 
         # 在柱状图上显示具体数值
@@ -1552,7 +1564,7 @@ def plot_optimized_prediction_gui(historical_df, base_pred_df, enhanced_pred_df,
         # 添加平均线
         avg_score = np.mean(scores)
         ax4.axhline(y=avg_score, color='red', linestyle='--', alpha=0.7,
-                    label=f'平均分: {avg_score:.2f}')
+                    label=f'Average: {avg_score:.2f}')
         ax4.legend(loc='upper right', fontsize=9)
 
     plt.tight_layout()
@@ -1562,7 +1574,7 @@ def plot_optimized_prediction_gui(historical_df, base_pred_df, enhanced_pred_df,
     plt.savefig(chart_filename, dpi=300, bbox_inches='tight', facecolor='white')
     plt.close()
 
-    print(f"📊 优化版预测图表已保存: {chart_filename}")
+    print(f"📊 Optimized prediction chart saved: {chart_filename}")
     return chart_filename
 
 
@@ -1594,22 +1606,22 @@ def mark_key_dates_safe(ax, future_dates, pred_df):
         if 0 <= max_idx < len(future_dates):
             max_price = pred_df_reset['close'].iloc[max_idx]
             ax.plot(future_dates[max_idx], max_price,
-                    'v', color='red', markersize=8, label=f'最高点: {max_price:.2f}')
+                    'v', color='red', markersize=8, label=f'High: {max_price:.2f}')
 
         # 标记最低点
         if 0 <= min_idx < len(future_dates):
             min_price = pred_df_reset['close'].iloc[min_idx]
             ax.plot(future_dates[min_idx], min_price,
-                    '^', color='green', markersize=8, label=f'最低点: {min_price:.2f}')
+                    '^', color='green', markersize=8, label=f'Low: {min_price:.2f}')
 
         # 标记预测结束点
         if len(future_dates) > 0:
             final_price = pred_df_reset['close'].iloc[-1]
             ax.plot(future_dates[-1], final_price,
-                    's', color='blue', markersize=6, label=f'最终预测: {final_price:.2f}')
+                    's', color='blue', markersize=6, label=f'Final Forecast: {final_price:.2f}')
 
     except Exception as e:
-        print(f"⚠️ 标记关键日期时出现错误: {e}")
+        print(f"⚠️ Error while marking key dates: {e}")
         # 如果出错，跳过标记但不影响整体流程
 
 

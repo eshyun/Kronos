@@ -15,8 +15,8 @@ from logging.handlers import RotatingFileHandler
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-sys.path.append("../")
-from model import KronosTokenizer
+sys.path.append("../src")
+from kronos import KronosTokenizer
 from finetune_base_model import CustomKlineDataset
 from config_loader import CustomFinetuneConfig
 

@@ -1,11 +1,14 @@
 import random
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
 
-from model import Kronos, KronosPredictor, KronosTokenizer
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+
+from kronos import Kronos, KronosPredictor, KronosTokenizer
 
 
 TEST_DATA_ROOT = Path(__file__).parent

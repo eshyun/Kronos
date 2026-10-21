@@ -17,8 +17,8 @@ import datetime
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-sys.path.append('../')
-from model import Kronos, KronosTokenizer, KronosPredictor
+sys.path.append('../src')
+from kronos import Kronos, KronosTokenizer, KronosPredictor
 from config_loader import CustomFinetuneConfig
 
 

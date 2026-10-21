@@ -25,7 +25,7 @@ def get_stock_data_eastmoney(stock_code="002354", start_year=2024, end_year=2025
     使用东方财富网API获取指定年份范围的股票数据 - 修复版
     """
     try:
-        print(f"正在从东方财富网获取股票 {stock_code} 的 {start_year}-{end_year} 年数据...")
+        print(f"Fetching {start_year}-{end_year} data for stock {stock_code} from Eastmoney...")
 
         # 计算日期范围
         start_date = f"{start_year}0101"
@@ -36,7 +36,7 @@ def get_stock_data_eastmoney(stock_code="002354", start_year=2024, end_year=2025
         else:
             end_date = current_date.strftime('%Y%m%d')
 
-        print(f"时间范围: {start_date} 到 {end_date}")
+        print(f"Date range: {start_date} to {end_date}")
 
         # 获取市场类型
         market = get_stock_market(stock_code)
@@ -68,7 +68,7 @@ def get_stock_data_eastmoney(stock_code="002354", start_year=2024, end_year=2025
 
         response = requests.get(url, params=params, headers=headers, timeout=10)
 
-        print(f"API响应状态码: {response.status_code}")
+        print(f"API response status code: {response.status_code}")
 
         if response.status_code == 200:
             # 处理JSONP响应
@@ -87,21 +87,21 @@ def get_stock_data_eastmoney(stock_code="002354", start_year=2024, end_year=2025
                 try:
                     data = json.loads(json_str)
                 except json.JSONDecodeError:
-                    print("❌ JSON解析失败，尝试直接解析...")
+                    print("❌ JSON parsing failed, trying direct parsing...")
                     # 如果JSON解析失败，尝试直接提取数据
                     return parse_kline_data_directly(response_text, stock_code, start_year, end_year)
             else:
-                print("❌ 无法找到JSON数据边界")
+                print("❌ Could not locate JSON data boundaries")
                 return None
 
-            print(f"API返回数据状态: {data.get('rc', 'N/A')}")
+            print(f"API returned data status: {data.get('rc', 'N/A')}")
 
             if data and data.get('data') is not None:
                 klines = data['data'].get('klines', [])
-                print(f"获取到 {len(klines)} 条K线数据")
+                print(f"Retrieved {len(klines)} K-line records")
 
                 if not klines:
-                    print("⚠️ K线数据为空")
+                    print("⚠️ K-line data is empty")
                     return None
 
                 # 解析数据
@@ -128,7 +128,7 @@ def get_stock_data_eastmoney(stock_code="002354", start_year=2024, end_year=2025
                         continue
 
                 if not stock_data:
-                    print("❌ 解析后无有效数据")
+                    print("❌ No valid data after parsing")
                     return None
 
                 df = pd.DataFrame(stock_data)
@@ -139,18 +139,18 @@ def get_stock_data_eastmoney(stock_code="002354", start_year=2024, end_year=2025
                 # 筛选指定年份的数据
                 df = df[(df.index.year >= start_year) & (df.index.year <= end_year)]
 
-                print(f"✅ 成功获取 {len(df)} 条有效数据")
-                print(f"实际时间范围: {df.index.min().strftime('%Y-%m-%d')} 到 {df.index.max().strftime('%Y-%m-%d')}")
+                print(f"✅ Successfully retrieved {len(df)} valid records")
+                print(f"Actual date range: {df.index.min().strftime('%Y-%m-%d')} to {df.index.max().strftime('%Y-%m-%d')}")
                 return df
             else:
-                print("❌ API返回数据为空")
+                print("❌ API returned empty data")
                 return None
         else:
-            print(f"❌ 请求失败，状态码: {response.status_code}")
+            print(f"❌ Request failed, status code: {response.status_code}")
             return None
 
     except Exception as e:
-        print(f"❌ 获取数据时出错: {str(e)}")
+        print(f"❌ Error while fetching data: {str(e)}")
         return None
 
 
@@ -190,10 +190,10 @@ def parse_kline_data_directly(response_text, stock_code, start_year, end_year):
                 df.set_index('日期', inplace=True)
                 df = df.sort_index()
                 df = df[(df.index.year >= start_year) & (df.index.year <= end_year)]
-                print(f"✅ 直接解析获取 {len(df)} 条数据")
+                print(f"✅ Direct parsing retrieved {len(df)} records")
                 return df
     except Exception as e:
-        print(f"❌ 直接解析也失败: {e}")
+        print(f"❌ Direct parsing also failed: {e}")
 
     return None
 
@@ -203,7 +203,7 @@ def get_stock_data_akshare(stock_code="002354", start_year=2024, end_year=2025):
     使用AKShare作为备用数据源 - 修复版
     """
     try:
-        print(f"尝试使用AKShare获取股票 {stock_code} 数据...")
+        print(f"Trying to fetch data for stock {stock_code} with AKShare...")
         import akshare as ak
 
         # 计算日期范围
@@ -244,17 +244,17 @@ def get_stock_data_akshare(stock_code="002354", start_year=2024, end_year=2025):
             # 筛选指定年份
             df = df[(df.index.year >= start_year) & (df.index.year <= end_year)]
 
-            print(f"✅ AKShare成功获取 {len(df)} 条数据")
+            print(f"✅ AKShare retrieved {len(df)} records")
             return df
         else:
-            print("❌ AKShare未返回数据")
+            print("❌ AKShare returned no data")
             return None
 
     except ImportError:
-        print("⚠️ AKShare未安装，使用 pip install akshare 安装")
+        print("⚠️ AKShare is not installed; install it with pip install akshare")
         return None
     except Exception as e:
-        print(f"❌ AKShare获取数据失败: {e}")
+        print(f"❌ AKShare failed to fetch data: {e}")
         return None
 
 
@@ -263,7 +263,7 @@ def get_stock_data_baostock(stock_code="002354", start_year=2024, end_year=2025)
     使用Baostock作为第三个数据源
     """
     try:
-        print(f"尝试使用Baostock获取股票 {stock_code} 数据...")
+        print(f"Trying to fetch data for stock {stock_code} with Baostock...")
         import baostock as bs
         import pandas as pd
 
@@ -336,17 +336,17 @@ def get_stock_data_baostock(stock_code="002354", start_year=2024, end_year=2025)
             # 计算涨跌额
             df['涨跌额'] = df['收盘价'].diff()
 
-            print(f"✅ Baostock成功获取 {len(df)} 条数据")
+            print(f"✅ Baostock retrieved {len(df)} records")
             return df
         else:
-            print("❌ Baostock未返回数据")
+            print("❌ Baostock returned no data")
             return None
 
     except ImportError:
-        print("⚠️ Baostock未安装，使用 pip install baostock 安装")
+        print("⚠️ Baostock is not installed; install it with pip install baostock")
         return None
     except Exception as e:
-        print(f"❌ Baostock获取数据失败: {e}")
+        print(f"❌ Baostock failed to fetch data: {e}")
         return None
 
 
@@ -357,27 +357,27 @@ def get_stock_data_with_retry(stock_code="002354", start_year=2024, end_year=202
     data_sources = [
         ("AKShare", get_stock_data_akshare),
         ("Baostock", get_stock_data_baostock),
-        ("东方财富", get_stock_data_eastmoney)
+        ("Eastmoney", get_stock_data_eastmoney)
     ]
 
     for source_name, data_func in data_sources:
-        print(f"\n🔍 尝试从 {source_name} 获取数据...")
+        print(f"\n🔍 Trying to fetch data from {source_name}...")
         data = data_func(stock_code, start_year, end_year)
 
         if data is not None and not data.empty:
             # 检查数据是否包含目标年份
             available_years = data.index.year.unique()
-            print(f"获取到的数据年份: {sorted(available_years)}")
+            print(f"Years present in retrieved data: {sorted(available_years)}")
 
             if any(year in available_years for year in range(start_year, end_year + 1)):
-                print(f"✅ {source_name} 数据获取成功！")
+                print(f"✅ Data retrieved successfully from {source_name}!")
                 # 标记数据来源
                 data.attrs['data_source'] = source_name
                 return data
             else:
-                print(f"⚠️ 数据未包含目标年份数据")
+                print(f"⚠️ Data does not include the target years")
 
-    print("❌ 所有真实数据源都失败，使用示例数据...")
+    print("❌ All real data sources failed; falling back to sample data...")
     return create_sample_data(stock_code, start_year, end_year)
 
 
@@ -385,7 +385,7 @@ def create_sample_data(stock_code="002354", start_year=2024, end_year=2025):
     """
     创建更真实的示例数据
     """
-    print(f"📊 创建 {start_year}-{end_year} 年的示例数据...")
+    print(f"📊 Creating sample data for {start_year}-{end_year}...")
 
     # 生成交易日（排除周末）
     start_date = datetime(start_year, 1, 1)
@@ -488,11 +488,11 @@ def create_sample_data(stock_code="002354", start_year=2024, end_year=2025):
     df = pd.DataFrame(stock_data)
     df.set_index('日期', inplace=True)
 
-    print(f"✅ 已创建 {len(df)} 条 {start_year}-{end_year} 年的模拟数据")
-    print(f"时间范围: {df.index.min().strftime('%Y-%m-%d')} 到 {df.index.max().strftime('%Y-%m-%d')}")
+    print(f"✅ Created {len(df)} simulated records for {start_year}-{end_year}")
+    print(f"Date range: {df.index.min().strftime('%Y-%m-%d')} to {df.index.max().strftime('%Y-%m-%d')}")
 
     # 标记为模拟数据
-    df.attrs['data_source'] = '模拟数据'
+    df.attrs['data_source'] = 'Simulated Data'
 
     return df
 
@@ -500,44 +500,56 @@ def create_sample_data(stock_code="002354", start_year=2024, end_year=2025):
 def display_data_info(df, stock_code, start_year, end_year):
     """显示数据信息"""
     if df is None or df.empty:
-        print("没有数据可显示")
+        print("No data to display")
         return
 
     # 获取数据来源
-    data_source = df.attrs.get('data_source', '未知来源')
+    data_source = df.attrs.get('data_source', 'Unknown source')
 
     print(f"\n{'=' * 60}")
-    print(f"股票 {stock_code} {start_year}-{end_year} 年数据摘要")
+    print(f"Stock {stock_code} {start_year}-{end_year} Data Summary")
     print(f"{'=' * 60}")
 
-    print(f"数据时间范围: {df.index.min().strftime('%Y-%m-%d')} 到 {df.index.max().strftime('%Y-%m-%d')}")
-    print(f"总交易天数: {len(df)}")
-    print(f"数据来源: {data_source}")
+    print(f"Data date range: {df.index.min().strftime('%Y-%m-%d')} to {df.index.max().strftime('%Y-%m-%d')}")
+    print(f"Total trading days: {len(df)}")
+    print(f"Data source: {data_source}")
 
     # 按年份显示统计
     for year in sorted(df.index.year.unique()):
         year_data = df[df.index.year == year]
-        print(f"\n{year}年统计:")
-        print(f"  交易天数: {len(year_data)}")
-        print(f"  平均收盘价: {year_data['收盘价'].mean():.2f} 元")
-        print(f"  最高价: {year_data['最高价'].max():.2f} 元")
-        print(f"  最低价: {year_data['最低价'].min():.2f} 元")
+        print(f"\n{year} statistics:")
+        print(f"  Trading days: {len(year_data)}")
+        print(f"  Average close price: {year_data['收盘价'].mean():.2f} CNY")
+        print(f"  Highest price: {year_data['最高价'].max():.2f} CNY")
+        print(f"  Lowest price: {year_data['最低价'].min():.2f} CNY")
         if len(year_data) > 1:
             year_return = (year_data['收盘价'].iloc[-1] / year_data['收盘价'].iloc[0] - 1) * 100
-            print(f"  年度涨跌幅: {year_return:+.2f}%")
+            print(f"  Annual change: {year_return:+.2f}%")
 
     # 显示最新交易日数据
     latest_date = df.index.max()
-    print(f"\n最新交易日 ({latest_date.strftime('%Y-%m-%d')}) 数据:")
+    print(f"\nLatest trading day ({latest_date.strftime('%Y-%m-%d')}) data:")
     latest_data = df.loc[latest_date]
+    display_labels = {
+        '开盘价': 'Open',
+        '收盘价': 'Close',
+        '最高价': 'High',
+        '最低价': 'Low',
+        '成交量': 'Volume',
+        '成交额': 'Amount',
+        '振幅': 'Amplitude',
+        '涨跌幅': 'Change %',
+        '涨跌额': 'Change',
+        '换手率': 'Turnover Rate'
+    }
     for col, value in latest_data.items():
         if col != '股票代码':
             if col in ['成交量']:
-                print(f"  {col}: {value:,.0f}")
+                print(f"  {display_labels.get(col, col)}: {value:,.0f}")
             elif col in ['成交额']:
-                print(f"  {col}: {value:,.2f} 万元")
+                print(f"  {display_labels.get(col, col)}: {value:,.2f} 10k CNY")
             else:
-                print(f"  {col}: {value}")
+                print(f"  {display_labels.get(col, col)}: {value}")
 
 
 def save_stock_data(df, stock_code, save_dir="D:/lianghuajiaoyi/Kronos/examples/data"):
@@ -555,7 +567,7 @@ def save_stock_data(df, stock_code, save_dir="D:/lianghuajiaoyi/Kronos/examples/
         df_reset = df.reset_index()
         df_reset.to_csv(csv_file, encoding='utf-8-sig', index=False)
 
-        print(f"\n📁 股票数据已保存: {csv_file}")
+        print(f"\n📁 Stock data saved to: {csv_file}")
         return True
     return False
 
@@ -568,16 +580,16 @@ def main(stock_code="002354", start_year=2024, end_year=2025):
     save_directory = "D:/lianghuajiaoyi/Kronos/examples/data"
 
     print("=" * 60)
-    print(f"开始获取股票 {stock_code} 的 {start_year}-{end_year} 年数据")
+    print(f"Fetching {start_year}-{end_year} data for stock {stock_code}")
     print("=" * 60)
-    print(f"数据将保存到: {save_directory}")
+    print(f"Data will be saved to: {save_directory}")
 
     # 检查必要库
     try:
         import requests
         import numpy as np
     except ImportError:
-        print("正在安装必要库...")
+        print("Installing required packages...")
         import subprocess
         subprocess.check_call(["pip", "install", "requests", "numpy", "pandas"])
         import requests
@@ -593,16 +605,16 @@ def main(stock_code="002354", start_year=2024, end_year=2025):
         # 保存数据到指定目录
         save_stock_data(stock_data, stock_code, save_directory)
 
-        print(f"\n🎉 股票 {stock_code} 数据处理完成!")
-        print(f"最新数据日期: {stock_data.index.max().strftime('%Y-%m-%d')}")
+        print(f"\n🎉 Stock {stock_code} data processing complete!")
+        print(f"Latest data date: {stock_data.index.max().strftime('%Y-%m-%d')}")
 
         # 显示保存的文件
         csv_file = os.path.join(save_directory, f"{stock_code}_stock_data.csv")
         if os.path.exists(csv_file):
             file_size = os.path.getsize(csv_file) / 1024  # KB
-            print(f"📄 生成的文件: {csv_file} ({file_size:.1f} KB)")
+            print(f"📄 Generated file: {csv_file} ({file_size:.1f} KB)")
     else:
-        print("❌ 未能获取股票数据")
+        print("❌ Failed to retrieve stock data")
 
 
 # 使用方法说明
@@ -618,12 +630,12 @@ if __name__ == "__main__":
     END_YEAR = 2025  # 结束年份
     # =====================================================
 
-    print("股票数据获取工具 - 终极优化版")
-    print("说明：修改代码中的 TARGET_STOCK_CODE 来获取不同股票的数据")
-    print(f"当前设置: 股票代码={TARGET_STOCK_CODE}, 年份范围={START_YEAR}-{END_YEAR}")
+    print("Stock Data Fetcher - Ultimate Optimized Edition")
+    print("Note: change TARGET_STOCK_CODE in the code to fetch data for other stocks")
+    print(f"Current settings: stock code={TARGET_STOCK_CODE}, year range={START_YEAR}-{END_YEAR}")
     print()
 
     # 运行主程序
     main(stock_code=TARGET_STOCK_CODE, start_year=START_YEAR, end_year=END_YEAR)
 
-    print(f"\n💡 提示：要获取其他股票数据，请修改代码中的 TARGET_STOCK_CODE 变量")
+    print(f"\n💡 Tip: to fetch data for other stocks, change the TARGET_STOCK_CODE variable in the code")

@@ -25,7 +25,7 @@ def get_stock_data_eastmoney_all_history(stock_code="002354"):
     使用东方财富网API获取股票所有历史数据
     """
     try:
-        print(f"正在从东方财富网获取股票 {stock_code} 的全部历史数据...")
+        print(f"Fetching full history for stock {stock_code} from Eastmoney...")
 
         # 获取市场类型
         market = get_stock_market(stock_code)
@@ -61,7 +61,7 @@ def get_stock_data_eastmoney_all_history(stock_code="002354"):
 
         response = requests.get(url, params=params, headers=headers, timeout=15)
 
-        print(f"API响应状态码: {response.status_code}")
+        print(f"API response status code: {response.status_code}")
 
         if response.status_code == 200:
             # 处理JSONP响应
@@ -80,20 +80,20 @@ def get_stock_data_eastmoney_all_history(stock_code="002354"):
                 try:
                     data = json.loads(json_str)
                 except json.JSONDecodeError:
-                    print("❌ JSON解析失败，尝试直接解析...")
+                    print("❌ JSON parsing failed, trying direct parsing...")
                     return parse_kline_data_directly_all_history(response_text, stock_code)
             else:
-                print("❌ 无法找到JSON数据边界")
+                print("❌ Could not find JSON data boundaries")
                 return None
 
-            print(f"API返回数据状态: {data.get('rc', 'N/A')}")
+            print(f"API data status: {data.get('rc', 'N/A')}")
 
             if data and data.get('data') is not None:
                 klines = data['data'].get('klines', [])
-                print(f"获取到 {len(klines)} 条历史K线数据")
+                print(f"Retrieved {len(klines)} historical kline records")
 
                 if not klines:
-                    print("⚠️ K线数据为空")
+                    print("⚠️ Kline data is empty")
                     return None
 
                 # 解析数据
@@ -120,7 +120,7 @@ def get_stock_data_eastmoney_all_history(stock_code="002354"):
                         continue
 
                 if not stock_data:
-                    print("❌ 解析后无有效数据")
+                    print("❌ No valid data after parsing")
                     return None
 
                 df = pd.DataFrame(stock_data)
@@ -128,19 +128,19 @@ def get_stock_data_eastmoney_all_history(stock_code="002354"):
                 df.set_index('日期', inplace=True)
                 df = df.sort_index()
 
-                print(f"✅ 成功获取 {len(df)} 条历史数据")
+                print(f"✅ Successfully retrieved {len(df)} historical records")
                 print(
-                    f"历史数据时间范围: {df.index.min().strftime('%Y-%m-%d')} 到 {df.index.max().strftime('%Y-%m-%d')}")
+                    f"History data range: {df.index.min().strftime('%Y-%m-%d')} to {df.index.max().strftime('%Y-%m-%d')}")
                 return df
             else:
-                print("❌ API返回数据为空")
+                print("❌ API returned empty data")
                 return None
         else:
-            print(f"❌ 请求失败，状态码: {response.status_code}")
+            print(f"❌ Request failed, status code: {response.status_code}")
             return None
 
     except Exception as e:
-        print(f"❌ 获取历史数据时出错: {str(e)}")
+        print(f"❌ Error fetching historical data: {str(e)}")
         return None
 
 
@@ -179,10 +179,10 @@ def parse_kline_data_directly_all_history(response_text, stock_code):
                 df['日期'] = pd.to_datetime(df['日期'])
                 df.set_index('日期', inplace=True)
                 df = df.sort_index()
-                print(f"✅ 直接解析获取 {len(df)} 条历史数据")
+                print(f"✅ Direct parsing retrieved {len(df)} historical records")
                 return df
     except Exception as e:
-        print(f"❌ 直接解析也失败: {e}")
+        print(f"❌ Direct parsing also failed: {e}")
 
     return None
 
@@ -192,7 +192,7 @@ def get_stock_data_akshare_all_history(stock_code="002354"):
     使用AKShare作为备用数据源 - 全历史版本
     """
     try:
-        print(f"尝试使用AKShare获取股票 {stock_code} 全部历史数据...")
+        print(f"Trying AKShare for full history of stock {stock_code}...")
         import akshare as ak
 
         # 获取所有历史数据
@@ -225,18 +225,18 @@ def get_stock_data_akshare_all_history(stock_code="002354"):
             df.set_index('日期', inplace=True)
             df = df.sort_index()
 
-            print(f"✅ AKShare成功获取 {len(df)} 条历史数据")
-            print(f"时间范围: {df.index.min().strftime('%Y-%m-%d')} 到 {df.index.max().strftime('%Y-%m-%d')}")
+            print(f"✅ AKShare retrieved {len(df)} historical records")
+            print(f"Time range: {df.index.min().strftime('%Y-%m-%d')} to {df.index.max().strftime('%Y-%m-%d')}")
             return df
         else:
-            print("❌ AKShare未返回数据")
+            print("❌ AKShare returned no data")
             return None
 
     except ImportError:
-        print("⚠️ AKShare未安装，使用 pip install akshare 安装")
+        print("⚠️ AKShare is not installed; install it with: pip install akshare")
         return None
     except Exception as e:
-        print(f"❌ AKShare获取历史数据失败: {e}")
+        print(f"❌ AKShare failed to fetch historical data: {e}")
         return None
 
 
@@ -245,7 +245,7 @@ def get_stock_data_baostock_all_history(stock_code="002354"):
     使用Baostock作为第三个数据源 - 全历史版本
     """
     try:
-        print(f"尝试使用Baostock获取股票 {stock_code} 全部历史数据...")
+        print(f"Trying Baostock for full history of stock {stock_code}...")
         import baostock as bs
         import pandas as pd
 
@@ -262,7 +262,7 @@ def get_stock_data_baostock_all_history(stock_code="002354"):
         # 获取上市日期
         rs = bs.query_stock_basic(code=full_code)
         if rs.error_code != '0':
-            print(f"❌ 获取股票基本信息失败: {rs.error_msg}")
+            print(f"❌ Failed to get stock basic info: {rs.error_msg}")
             bs.logout()
             return None
 
@@ -272,11 +272,11 @@ def get_stock_data_baostock_all_history(stock_code="002354"):
             list_date = rs.get_row_data()[2]  # 上市日期在第三个字段
 
         if not list_date:
-            print("❌ 无法获取上市日期")
+            print("❌ Could not get listing date")
             bs.logout()
             return None
 
-        print(f"股票上市日期: {list_date}")
+        print(f"Stock listing date: {list_date}")
 
         # 获取从上市日期到现在的所有数据
         end_date = datetime.now().strftime('%Y-%m-%d')
@@ -336,18 +336,18 @@ def get_stock_data_baostock_all_history(stock_code="002354"):
             # 清理无效数据
             df = df.dropna()
 
-            print(f"✅ Baostock成功获取 {len(df)} 条历史数据")
-            print(f"时间范围: {df.index.min().strftime('%Y-%m-%d')} 到 {df.index.max().strftime('%Y-%m-%d')}")
+            print(f"✅ Baostock retrieved {len(df)} historical records")
+            print(f"Time range: {df.index.min().strftime('%Y-%m-%d')} to {df.index.max().strftime('%Y-%m-%d')}")
             return df
         else:
-            print("❌ Baostock未返回数据")
+            print("❌ Baostock returned no data")
             return None
 
     except ImportError:
-        print("⚠️ Baostock未安装，使用 pip install baostock 安装")
+        print("⚠️ Baostock is not installed; install it with: pip install baostock")
         return None
     except Exception as e:
-        print(f"❌ Baostock获取历史数据失败: {e}")
+        print(f"❌ Baostock failed to fetch historical data: {e}")
         return None
 
 
@@ -358,20 +358,20 @@ def get_stock_data_with_retry_all_history(stock_code="002354", retry_count=2):
     data_sources = [
         ("AKShare", get_stock_data_akshare_all_history),
         ("Baostock", get_stock_data_baostock_all_history),
-        ("东方财富", get_stock_data_eastmoney_all_history)
+        ("Eastmoney", get_stock_data_eastmoney_all_history)
     ]
 
     for source_name, data_func in data_sources:
-        print(f"\n🔍 尝试从 {source_name} 获取全部历史数据...")
+        print(f"\n🔍 Trying to fetch full history from {source_name}...")
         data = data_func(stock_code)
 
         if data is not None and not data.empty:
-            print(f"✅ {source_name} 历史数据获取成功！")
+            print(f"✅ {source_name} historical data fetched successfully!")
             # 标记数据来源
             data.attrs['data_source'] = source_name
             return data
 
-    print("❌ 所有真实数据源都失败，使用示例数据...")
+    print("❌ All real data sources failed; using sample data...")
     return create_sample_data_all_history(stock_code)
 
 
@@ -390,7 +390,7 @@ def create_sample_data_all_history(stock_code="002354"):
     list_year = list_years.get(stock_code, 2010)
     current_year = datetime.now().year
 
-    print(f"📊 创建 {stock_code} 从 {list_year} 年上市至今的示例数据...")
+    print(f"📊 Creating sample data for {stock_code} from listing year {list_year} to now...")
 
     # 生成从上市年份到现在的交易日（排除周末）
     start_date = datetime(list_year, 1, 1)
@@ -492,11 +492,11 @@ def create_sample_data_all_history(stock_code="002354"):
     df = pd.DataFrame(stock_data)
     df.set_index('日期', inplace=True)
 
-    print(f"✅ 已创建 {len(df)} 条从 {list_year} 年至今的模拟历史数据")
-    print(f"时间范围: {df.index.min().strftime('%Y-%m-%d')} 到 {df.index.max().strftime('%Y-%m-%d')}")
+    print(f"✅ Created {len(df)} simulated historical records from {list_year} to now")
+    print(f"Time range: {df.index.min().strftime('%Y-%m-%d')} to {df.index.max().strftime('%Y-%m-%d')}")
 
     # 标记为模拟数据
-    df.attrs['data_source'] = '模拟历史数据'
+    df.attrs['data_source'] = 'Simulated history data'
 
     return df
 
@@ -504,23 +504,23 @@ def create_sample_data_all_history(stock_code="002354"):
 def display_all_history_data_info(df, stock_code):
     """显示全历史数据信息"""
     if df is None or df.empty:
-        print("没有数据可显示")
+        print("No data to display")
         return
 
     # 获取数据来源
-    data_source = df.attrs.get('data_source', '未知来源')
+    data_source = df.attrs.get('data_source', 'Unknown source')
 
     print(f"\n{'=' * 60}")
-    print(f"股票 {stock_code} 全部历史数据摘要")
+    print(f"Full history summary for stock {stock_code}")
     print(f"{'=' * 60}")
 
-    print(f"数据时间范围: {df.index.min().strftime('%Y-%m-%d')} 到 {df.index.max().strftime('%Y-%m-%d')}")
-    print(f"总交易天数: {len(df):,}")
-    print(f"数据来源: {data_source}")
+    print(f"Data range: {df.index.min().strftime('%Y-%m-%d')} to {df.index.max().strftime('%Y-%m-%d')}")
+    print(f"Total trading days: {len(df):,}")
+    print(f"Data source: {data_source}")
 
     # 按年份显示统计
     years = sorted(df.index.year.unique())
-    print(f"\n历史年份: {years}")
+    print(f"\nHistorical years: {years}")
 
     # 显示关键年份统计
     key_years = [years[0]]  # 上市年份
@@ -532,35 +532,48 @@ def display_all_history_data_info(df, stock_code):
     for year in sorted(set(key_years)):
         year_data = df[df.index.year == year]
         if len(year_data) > 0:
-            print(f"\n{year}年统计:")
-            print(f"  交易天数: {len(year_data)}")
-            print(f"  平均收盘价: {year_data['收盘价'].mean():.2f} 元")
-            print(f"  最高价: {year_data['最高价'].max():.2f} 元")
-            print(f"  最低价: {year_data['最低价'].min():.2f} 元")
+            print(f"\n{year} statistics:")
+            print(f"  Trading days: {len(year_data)}")
+            print(f"  Average close: {year_data['收盘价'].mean():.2f} CNY")
+            print(f"  Highest price: {year_data['最高价'].max():.2f} CNY")
+            print(f"  Lowest price: {year_data['最低价'].min():.2f} CNY")
             if len(year_data) > 1:
                 year_return = (year_data['收盘价'].iloc[-1] / year_data['收盘价'].iloc[0] - 1) * 100
-                print(f"  年度涨跌幅: {year_return:+.2f}%")
+                print(f"  Annual change: {year_return:+.2f}%")
 
     # 显示整体统计
-    print(f"\n整体统计:")
+    print(f"\nOverall statistics:")
     total_return = (df['收盘价'].iloc[-1] / df['收盘价'].iloc[0] - 1) * 100
-    print(f"  总涨跌幅: {total_return:+.2f}%")
-    print(f"  历史最高价: {df['最高价'].max():.2f} 元")
-    print(f"  历史最低价: {df['最低价'].min():.2f} 元")
-    print(f"  平均日成交量: {df['成交量'].mean():,.0f} 股")
+    print(f"  Total change: {total_return:+.2f}%")
+    print(f"  All-time high: {df['最高价'].max():.2f} CNY")
+    print(f"  All-time low: {df['最低价'].min():.2f} CNY")
+    print(f"  Average daily volume: {df['成交量'].mean():,.0f} shares")
 
     # 显示最新交易日数据
     latest_date = df.index.max()
-    print(f"\n最新交易日 ({latest_date.strftime('%Y-%m-%d')}) 数据:")
+    print(f"\nLatest trading day ({latest_date.strftime('%Y-%m-%d')}) data:")
     latest_data = df.loc[latest_date]
+    display_names = {
+        '开盘价': 'Open',
+        '收盘价': 'Close',
+        '最高价': 'High',
+        '最低价': 'Low',
+        '成交量': 'Volume',
+        '成交额': 'Turnover',
+        '振幅': 'Amplitude',
+        '涨跌幅': 'Change %',
+        '涨跌额': 'Change',
+        '换手率': 'Turnover rate'
+    }
     for col, value in latest_data.items():
         if col != '股票代码':
+            name = display_names.get(col, col)
             if col in ['成交量']:
-                print(f"  {col}: {value:,.0f}")
+                print(f"  {name}: {value:,.0f}")
             elif col in ['成交额']:
-                print(f"  {col}: {value:,.2f} 万元")
+                print(f"  {name}: {value:,.2f} 10k CNY")
             else:
-                print(f"  {col}: {value}")
+                print(f"  {name}: {value}")
 
 
 def save_all_history_stock_data(df, stock_code, save_dir="D:/lianghuajiaoyi/Kronos/examples/data"):
@@ -578,7 +591,7 @@ def save_all_history_stock_data(df, stock_code, save_dir="D:/lianghuajiaoyi/Kron
         df_reset = df.reset_index()
         df_reset.to_csv(csv_file, encoding='utf-8-sig', index=False)
 
-        print(f"\n📁 全历史股票数据已保存: {csv_file}")
+        print(f"\n📁 Full-history stock data saved: {csv_file}")
 
         # 同时保存一个按年份分割的版本
         years = df_reset['日期'].dt.year.unique()
@@ -587,7 +600,7 @@ def save_all_history_stock_data(df, stock_code, save_dir="D:/lianghuajiaoyi/Kron
             year_file = os.path.join(save_dir, f"{stock_code}_{year}.csv")
             year_data.to_csv(year_file, encoding='utf-8-sig', index=False)
 
-        print(f"📁 同时保存了 {len(years)} 个年份的单独数据文件")
+        print(f"📁 Also saved separate data files for {len(years)} year(s)")
         return True
     return False
 
@@ -600,16 +613,16 @@ def main_all_history(stock_code="002354"):
     save_directory = "D:/lianghuajiaoyi/Kronos/examples/data"
 
     print("=" * 60)
-    print(f"开始获取股票 {stock_code} 的全部历史数据")
+    print(f"Starting to fetch full history for stock {stock_code}")
     print("=" * 60)
-    print(f"数据将保存到: {save_directory}")
+    print(f"Data will be saved to: {save_directory}")
 
     # 检查必要库
     try:
         import requests
         import numpy as np
     except ImportError:
-        print("正在安装必要库...")
+        print("Installing required libraries...")
         import subprocess
         subprocess.check_call(["pip", "install", "requests", "numpy", "pandas"])
         import requests
@@ -625,18 +638,18 @@ def main_all_history(stock_code="002354"):
         # 保存全历史数据到指定目录
         save_all_history_stock_data(stock_data, stock_code, save_directory)
 
-        print(f"\n🎉 股票 {stock_code} 全历史数据处理完成!")
+        print(f"\n🎉 Full history processing for stock {stock_code} completed!")
         print(
-            f"数据时间跨度: {stock_data.index.min().strftime('%Y-%m-%d')} 到 {stock_data.index.max().strftime('%Y-%m-%d')}")
-        print(f"总交易天数: {len(stock_data):,}")
+            f"Data span: {stock_data.index.min().strftime('%Y-%m-%d')} to {stock_data.index.max().strftime('%Y-%m-%d')}")
+        print(f"Total trading days: {len(stock_data):,}")
 
         # 显示保存的文件
         csv_file = os.path.join(save_directory, f"{stock_code}_all_history.csv")
         if os.path.exists(csv_file):
             file_size = os.path.getsize(csv_file) / 1024  # KB
-            print(f"📄 生成的文件: {csv_file} ({file_size:.1f} KB)")
+            print(f"📄 Generated file: {csv_file} ({file_size:.1f} KB)")
     else:
-        print("❌ 未能获取股票全历史数据")
+        print("❌ Failed to fetch full history data for the stock")
 
 
 # 使用方法说明
@@ -650,12 +663,12 @@ if __name__ == "__main__":
     TARGET_STOCK_CODE = "300418"  # 股票代码
     # =====================================================
 
-    print("股票全历史数据获取工具")
-    print("说明：修改代码中的 TARGET_STOCK_CODE 来获取不同股票的全部历史数据")
-    print(f"当前设置: 股票代码={TARGET_STOCK_CODE}")
+    print("Stock full-history data fetching tool")
+    print("Note: modify TARGET_STOCK_CODE in this code to fetch full history for a different stock")
+    print(f"Current setting: stock code={TARGET_STOCK_CODE}")
     print()
 
     # 运行主程序
     main_all_history(stock_code=TARGET_STOCK_CODE)
 
-    print(f"\n💡 提示：要获取其他股票的全历史数据，请修改代码中的 TARGET_STOCK_CODE 变量")
+    print(f"\n💡 Tip: to fetch full history for another stock, change the TARGET_STOCK_CODE variable in this code")
